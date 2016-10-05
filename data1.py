@@ -9,7 +9,7 @@ from multiprocessing.pool import ThreadPool
 random.seed(5)
 
 num_days = 10
-src_root = "/home/yyk/stockmarket/quantquote_daily_sp500/"
+src_root = "./quantquote_daily_sp500/"
 output_dir_root = "/data/stock/"
 # output_dir = output_dir_root + str(num_days) + "-2percent"
 output_dir = output_dir_root + str(num_days)
@@ -51,7 +51,7 @@ def pickle_all(window_size, test_count):
     file_paths = os.listdir(src_root + "daily/")
 
 #     file_paths = ('table_flir.csv',)
-    # file_paths = file_paths[:5]
+    file_paths = file_paths[:5]
 
     (train, tests) = load_batch(file_paths, window_size, test_count)
 
