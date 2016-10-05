@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from keras.utils import np_utils
 import os
 
 source_root = "./quantquote_daily_sp500/daily/"
