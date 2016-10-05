@@ -2,8 +2,14 @@ import pandas as pd
 import numpy as np
 from keras.utils import np_utils
 import os
+import sys
 
 source_root = "./quantquote_daily_sp500/daily/"
+output_root = "./quantquote_daily_sp500/generated/"
+x_train_file = output_root + "x_train"
+y_train_file = output_root + "y_train"
+x_test_file = output_root + "x_test"
+y_test_file = output_root + "y_test"
 
 def process(file_path):
     a = pd.read_csv(file_path, names=['date', 'unknown', 'open', 'high', 'low', 'close', 'volume'],
@@ -48,31 +54,50 @@ def buildSample(a):
   else:
     c = 1
   y = np.array([c])
-  return (a.T, y)
+  return (a[:-5].T, y)
 
-def load_all():
+def gen_all():
   fs = os.listdir(source_root)
-  fs = fs[:5]
+#   fs = fs[:5]
 
   x_trains = []
   y_trains = []
   x_tests = []
   y_tests = []
+#   i = 0
   for f in fs:
     x_train, y_train, x_test, y_test = load(source_root + f)
-    print("Loaded " + f)
+#     i += 1
+#     print("%d Loaded %s" % (i, f))
     x_trains.extend(x_train)
     y_trains.extend(y_train)
     x_tests.extend(x_test)
     y_tests.extend(y_test)
+  print("Creating np arrays")
   return np.array(x_trains), \
          np_utils.to_categorical(np.array(y_trains), 2), \
          np.array(x_tests), \
          np_utils.to_categorical(np.array(y_tests), 2)
 
+def load_all():
+  print("Loading " + x_train_file + ".npy")
+  x_train = np.load(x_train_file + ".npy")
+  print("Loading " + y_train_file + ".npy")
+  y_train = np.load(y_train_file + ".npy")
+  print("Loading " + x_test_file + ".npy")
+  x_test = np.load(x_test_file + ".npy")
+  print("Loading " + y_test_file + ".npy")
+  y_test = np.load(y_test_file + ".npy")
+
 if __name__ == '__main__':
-  x_train, y_train, x_test, y_test = load_all()
+  x_train, y_train, x_test, y_test = gen_all()
+#   print(x_test.dtype)
+  print("Start writing")
   print(x_train.shape)
+  np.save(x_train_file, x_train)
   print(y_train.shape)
+  np.save(y_train_file, y_train)
   print(x_test.shape)
+  np.save(x_test_file, x_test)
   print(y_test.shape)
+  np.save(y_test_file, y_test)
