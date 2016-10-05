@@ -1,4 +1,4 @@
-import data1 as data
+import data2 as data
 from keras.callbacks import ModelCheckpoint
 import keras
 from keras.layers.wrappers import TimeDistributed
@@ -17,33 +17,13 @@ batch_size = 2048
 # batch_size = 8192
 nb_epoch = 10000
 
-(X_train, y_train), tests = data.load_all(100, 100)
-nb_classes = len(tests.keys())
-
-X_test = None
-y_test = None
-for value in tests.values():
-    if X_test is None:
-        X_test = np.array(value[0])
-        y_test = np.array(value[1])
-    else:
-        X_test = np.append(X_test, value[0], 0)
-        y_test = np.append(y_test, value[1], 0)
+X_train, Y_train, X_test, Y_test = data.load_all()
+nb_classes = 2
 
 # input image dimensions
 length = X_train.shape[2]
 channel = X_train.shape[1]
 print("samples: %d channel: %d length: %d" % (X_train.shape[0], channel, length))
-
-X_train = X_train.astype('float32')
-X_test = X_test.astype('float32')
-
-Y_train = np_utils.to_categorical(y_train, nb_classes)
-Y_test = np_utils.to_categorical(y_test, nb_classes)
-
-tests = dict(
-    (category, (x.astype('float32'), np_utils.to_categorical(y, nb_classes)))
-    for category, (x, y) in tests.items())
 
 print(X_train.shape)
 print(Y_train.shape)
@@ -57,46 +37,46 @@ model = Sequential()
 
 model.add(Convolution1D(
     nb_filter=64,
-    filter_length=3,
+    filter_length=1,
     activation='relu',
     border_mode='same',
     input_shape=input_shape))
 
-model.add(Convolution1D(
-    nb_filter=128,
-    filter_length=3,
-    border_mode='same',
-    activation='relu'))
-
-model.add(Convolution1D(
-    nb_filter=256,
-    filter_length=3,
-    border_mode='same',
-    activation='relu'))
-
-model.add(Convolution1D(
-    nb_filter=512,
-    filter_length=3,
-    border_mode='same',
-    activation='relu'))
-
-model.add(Convolution1D(
-    nb_filter=512,
-    filter_length=3,
-    border_mode='same',
-    activation='relu'))
-
-model.add(Convolution1D(
-    nb_filter=1024,
-    filter_length=3,
-    border_mode='same',
-    activation='relu'))
-
-model.add(Convolution1D(
-    nb_filter=1024,
-    filter_length=3,
-    border_mode='same',
-    activation='relu'))
+# model.add(Convolution1D(
+#     nb_filter=128,
+#     filter_length=3,
+#     border_mode='same',
+#     activation='relu'))
+# 
+# model.add(Convolution1D(
+#     nb_filter=256,
+#     filter_length=3,
+#     border_mode='same',
+#     activation='relu'))
+# 
+# model.add(Convolution1D(
+#     nb_filter=512,
+#     filter_length=3,
+#     border_mode='same',
+#     activation='relu'))
+# 
+# model.add(Convolution1D(
+#     nb_filter=512,
+#     filter_length=3,
+#     border_mode='same',
+#     activation='relu'))
+# 
+# model.add(Convolution1D(
+#     nb_filter=1024,
+#     filter_length=3,
+#     border_mode='same',
+#     activation='relu'))
+# 
+# model.add(Convolution1D(
+#     nb_filter=1024,
+#     filter_length=3,
+#     border_mode='same',
+#     activation='relu'))
 
 # model.add(Convolution1D(
 #     nb_filter=512,
