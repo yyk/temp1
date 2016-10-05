@@ -1,0 +1,4 @@
+*.pickle
+*.pyc
+*.swp
+quantquote_daily_sp500/

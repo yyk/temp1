@@ -1,60 +1,134 @@
 import os
+import os.path
+import itertools
 import numpy as np
+import random
+import pickle
+from multiprocessing.pool import ThreadPool
+
+random.seed(5)
+
+num_days = 3
+dir_root = "/tmp/stock/"
+suffix = "up_down_next_%d_days" % num_days
+total_loaded = 0
 
 def load_all(window_size, test_count):
-    symbols = [ s.split('.')[0].split('_')[1]
-      for s in os.listdir("/home/yyk/stockmarket/quantquote_daily_sp500/daily/") ]
-    symbols = symbols[:10]
-    X_train = np.empty(shape = [0, window_size, 6])
-    Y_train = np.empty(shape = [0, 1])
-    X_test = np.empty(shape = [0, window_size, 6])
-    Y_test = np.empty(shape = [0, 1])
-    for s in symbols:
-        (X1, Y1), (X2, Y2) = load(s, window_size, test_count)
-    np.concatenate((X_train, X1))
-    np.concatenate((Y_train, Y1))
-    np.concatenate((X_test, X2))
-    np.concatenate((Y_test, Y2))
+    """
+    returns a tensor of dimensions (number of samples, channels (6), length)
+    """
+    output_file=dir_root + "daily_%s_%s.pickle" % (window_size, suffix)
 
-    return (X_train, Y_train), (X_test, Y_test)
-
-def load(symbol, window_size, test_count):
-    f = open("./quantquote_daily_sp500/daily/table_%s.csv" % symbol, "r")
-    lines = [line.strip() for line in f]
-    X_train = np.empty(shape = [0, window_size, 6])
-    Y_train = np.empty(shape = [0, 1])
-    X_test = np.empty(shape = [0, window_size, 6])
-    Y_test = np.empty(shape = [0, 1])
-    for i in range(0, len(lines) - window_size):
-        (X, Y) = build(lines[i : i + window_size + 1])
-        if i + test_count > len(lines):
-            np.append(X_test, X)
-            np.append(Y_test, 3)
+    shard = 0
+    X_train = []
+    while True:
+        f = output_file + ".xtrain.shard%d" % shard
+        if os.path.isfile(f):
+            print("Loading %s" % f)
+            X_train.extend(pickle.load(open(f, "rb")))
         else:
-            np.append(X_train, X)
-            np.append(Y_train, 3)
+            break
+        shard += 1
 
-    print("Loaded %s" % symbol)
-    return (X_train, Y_train), (X_test, Y_test)
+    Y_train = pickle.load(open(output_file + ".ytrain", "rb"))
+    X_test = pickle.load(open(output_file + ".xtest", "rb"))
+    Y_test = pickle.load(open(output_file + ".ytest", "rb"))
+    return (np.array(X_train), np.array(Y_train)), (np.array(X_test), np.array(Y_test))
+
+def pickle_all(window_size, test_count):
+    file_paths = os.listdir(dir_root + "daily/")
+
+#     file_paths = file_paths[:5]
+
+    # pool = ThreadPool(processes=50)
+    # futures = []
+    # for path in file_paths:
+    #     futures.append(pool.apply_async(load, (path, window_size, test_count)))
+    #
+    # train = []
+    # test = []
+    # for future in futures:
+    #     (a, b) = future.get()
+    #     train.extend(a)
+    #     test.extend(b)
+
+    (train, test) = load_batch(file_paths, window_size, test_count)
+
+    random.shuffle(train)
+    x_train = [ t[0] for t in train ]
+    y_train = [ t[1] for t in train ]
+    random.shuffle(test)
+    x_test = [ t[0] for t in test ]
+    y_test = [ t[1] for t in test ]
+
+#     return (np.array(x_train), np.array(y_train)), (np.array(x_test), np.array(y_test))
+    return (x_train, y_train), (x_test, y_test)
+
+def load_batch(file_paths, window_size, test_count):
+    train = []
+    test = []
+    for file_path in file_paths:
+        train_, test_ = load(file_path, window_size, test_count)
+        train.extend(train_)
+        test.extend(test_)
+    return train, test
+
+def load(file_path, window_size, test_count):
+    global total_loaded
+    f = open(dir_root + "/daily/" + file_path, "r")
+    lines = [line.strip().split(',') for line in f]
+    lines = [(float(l[0]), float(l[2]), float(l[3]), float(l[4]), float(l[5]), float(l[6])) for l in lines]
+    train = []
+    test = []
+    for i in range(0, len(lines) - window_size):
+        (X, Y) = build(lines[i : i + window_size])
+        last_line = lines[i + window_size]
+        last_date = last_line[0]
+        if last_date > 20120101:
+            test.append((X, Y))
+        else:
+            train.append((X, Y))
+
+    total_loaded += 1
+    print("%d Loaded %s %d %d" % (total_loaded, file_path, len(train), len(test)))
+    return train, test
 
 def build(lines):
-    X = np.empty(shape = [len(lines) - 1, 6])
-    for line in lines[:-1]:
-        (d, unknown, o, h, l, c, v) = [ float(s) for s in line.split(',') ]
-        x = np.array([d, o, h, l, c, v], np.float32)
-        np.append(X, x)
-    c1 = float(lines[-2].split(',')[5])
-    c2 = float(lines[-1].split(',')[5])
-    ratio = (c2-c1)/c1
-    if ratio < -0.05:
-        y = 1
-    elif ratio < 0.05:
-        y = 2
+    channels = []
+    for i in range(0, 6):
+        channels.append([])
+    for line in lines[:-num_days]:
+        for i in range(0,6):
+            channels[i].append(line[i])
+    xarr = []
+    for i in range(0, 6):
+        xarr.append(np.array(channels[i]))
+    X = np.array(xarr)
+    c1 = lines[-1-num_days][5]
+    c2 = lines[-1][5]
+    if c1 > c2:
+        c = 0
     else:
-        y = 3
-    Y = np.array([3])
+        c = 1
+    # print(ratio, c)
+    Y = np.array([c])
     return (X, Y)
 
 if __name__ == '__main__':
-    load_all(100, 100)
+    (X1, Y1), (X2, Y2) = pickle_all(100, 100)
+    print("writing")
+    output_file = "/home/yyk/stockmarket/quantquote_daily_sp500/daily_100_%s.pickle" % suffix
+    i = 0
+    shard = 0
+    step = 100000
+    while i <= len(X1):
+        end = len(X1) if i + step > len(X1) else i + step
+        f = output_file + ".xtrain.shard%d" % shard
+        print("Writing %s" % f)
+        pickle.dump(X1[i:end], open(f, "wb"))
+        i += step
+        shard += 1
+    pickle.dump(Y1, open(output_file + ".ytrain", "wb"))
+    pickle.dump(X2, open(output_file + ".xtest", "wb"))
+    pickle.dump(Y2, open(output_file + ".ytest", "wb"))
 
