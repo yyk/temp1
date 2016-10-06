@@ -17,8 +17,11 @@ batch_size = 2048
 # batch_size = 8192
 nb_epoch = 10000
 
-X_train, Y_train, X_test, Y_test = data.load_all()
+X_train, y_train, X_test, y_test = data.load_all()
 nb_classes = 2
+
+Y_train = np_utils.to_categorical(np.array(y_train), 2)
+Y_test = np_utils.to_categorical(np.array(y_test), 2)
 
 # input image dimensions
 length = X_train.shape[2]
@@ -35,14 +38,15 @@ print("input_shape: %s" % (input_shape,))
 
 model = Sequential()
 
-model.add(Convolution1D(nb_filter=64, filter_length=1, activation='relu', border_mode='same', input_shape=input_shape))
-model.add(Convolution1D(nb_filter=128, filter_length=1, activation='relu', border_mode='same', input_shape=input_shape))
-model.add(Convolution1D(nb_filter=128, filter_length=1, activation='relu', border_mode='same', input_shape=input_shape))
+model.add(Convolution1D(nb_filter=16, filter_length=1, activation='relu', border_mode='same', input_shape=input_shape))
+# model.add(Convolution1D(nb_filter=64, filter_length=1, activation='relu', border_mode='same', input_shape=input_shape))
+# model.add(Convolution1D(nb_filter=128, filter_length=1, activation='relu', border_mode='same', input_shape=input_shape))
+# model.add(Convolution1D(nb_filter=128, filter_length=1, activation='relu', border_mode='same', input_shape=input_shape))
 
-model.add(LSTM(2048))
+# model.add(LSTM(2048))
 # model.add(TimeDistributed(LSTM(512)))
 # model.add(LSTM(512))
-# model.add(LSTM(2048))
+model.add(LSTM(32))
 # model.add(GRU(2048))
 
 # model.add(Dense(8192))
@@ -79,10 +83,10 @@ for epoch in range(nb_epoch):
 
     if (epoch+1) % 5 == 0:
         y_pred = model.predict_classes(X_train, batch_size=batch_size)
-        accuracy = accuracy_score(Y_train, y_pred)
-        recall = recall_score(Y_train, y_pred)
-        precision = precision_score(Y_train, y_pred)
-        f1 = f1_score(Y_train, y_pred)
+        accuracy = accuracy_score(y_train, y_pred)
+        recall = recall_score(y_train, y_pred)
+        precision = precision_score(y_train, y_pred)
+        f1 = f1_score(y_train, y_pred)
         print('training set\n', 'Accuracy: {}\n'.format(accuracy), 'Recall: {}\n'.format(recall),
               'Precision: {}\n'.format(precision),
               'F1: {}'.format(f1))

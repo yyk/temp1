@@ -75,9 +75,9 @@ def gen_all():
     y_tests.extend(y_test)
   print("Creating np arrays")
   return np.array(x_trains), \
-         np_utils.to_categorical(np.array(y_trains), 2), \
+         np.array(y_trains), \
          np.array(x_tests), \
-         np_utils.to_categorical(np.array(y_tests), 2)
+         np.array(y_tests)
 
 def load_all():
   print("Loading " + x_train_file + ".npy")
