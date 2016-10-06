@@ -77,12 +77,12 @@ for epoch in range(nb_epoch):
           )
     print('epoch {}'.format(str(epoch)))
 
-    if epoch % 5 == 0:
+    if (epoch+1) % 5 == 0:
         y_pred = model.predict_classes(X_train, batch_size=batch_size)
-        accuracy = accuracy_score(y_train, y_pred)
-        recall = recall_score(y_train, y_pred)
-        precision = precision_score(y_train, y_pred)
-        f1 = f1_score(y_train, y_pred)
+        accuracy = accuracy_score(Y_train, y_pred)
+        recall = recall_score(Y_train, y_pred)
+        precision = precision_score(Y_train, y_pred)
+        f1 = f1_score(Y_train, y_pred)
         print('training set\n', 'Accuracy: {}\n'.format(accuracy), 'Recall: {}\n'.format(recall),
               'Precision: {}\n'.format(precision),
               'F1: {}'.format(f1))
