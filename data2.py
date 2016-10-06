@@ -88,12 +88,23 @@ def load_all():
   x_test = np.load(x_test_file + ".npy")
   print("Loading " + y_test_file + ".npy")
   y_test = np.load(y_test_file + ".npy")
+  return x_train, y_train, x_test, y_test
 
 if __name__ == '__main__':
   x_train, y_train, x_test, y_test = gen_all()
 #   print(x_test.dtype)
+
+  print("Shuffling")
+  s = np.random.permutation(len(x_train))
+  x_train = x_train[s]
+  y_train = y_train[s]
+  s = np.random.permutation(len(x_test))
+  x_test = x_test[s]
+  y_test = y_test[s]
+
   print("Start writing")
   print(x_train.shape)
+
   np.save(x_train_file, x_train)
   print(y_train.shape)
   np.save(y_train_file, y_train)

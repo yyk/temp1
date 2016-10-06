@@ -35,54 +35,9 @@ print("input_shape: %s" % (input_shape,))
 
 model = Sequential()
 
-model.add(Convolution1D(
-    nb_filter=64,
-    filter_length=1,
-    activation='relu',
-    border_mode='same',
-    input_shape=input_shape))
-
-# model.add(Convolution1D(
-#     nb_filter=128,
-#     filter_length=3,
-#     border_mode='same',
-#     activation='relu'))
-# 
-# model.add(Convolution1D(
-#     nb_filter=256,
-#     filter_length=3,
-#     border_mode='same',
-#     activation='relu'))
-# 
-# model.add(Convolution1D(
-#     nb_filter=512,
-#     filter_length=3,
-#     border_mode='same',
-#     activation='relu'))
-# 
-# model.add(Convolution1D(
-#     nb_filter=512,
-#     filter_length=3,
-#     border_mode='same',
-#     activation='relu'))
-# 
-# model.add(Convolution1D(
-#     nb_filter=1024,
-#     filter_length=3,
-#     border_mode='same',
-#     activation='relu'))
-# 
-# model.add(Convolution1D(
-#     nb_filter=1024,
-#     filter_length=3,
-#     border_mode='same',
-#     activation='relu'))
-
-# model.add(Convolution1D(
-#     nb_filter=512,
-#     filter_length=2,
-#     border_mode='valid',
-#     activation='relu'))
+model.add(Convolution1D(nb_filter=64, filter_length=1, activation='relu', border_mode='same', input_shape=input_shape))
+model.add(Convolution1D(nb_filter=128, filter_length=1, activation='relu', border_mode='same', input_shape=input_shape))
+model.add(Convolution1D(nb_filter=128, filter_length=1, activation='relu', border_mode='same', input_shape=input_shape))
 
 model.add(LSTM(2048))
 # model.add(TimeDistributed(LSTM(512)))
@@ -116,9 +71,9 @@ for epoch in range(nb_epoch):
             verbose=1,
             validation_data=(X_test, Y_test),
             # callbacks=callbacks_list)
-            class_weight = {
-                0: 2,
-                1: 1.0}
+            # class_weight = {
+            #     0: 2,
+            #     1: 1.0}
           )
     print('epoch {}'.format(str(epoch)))
 
