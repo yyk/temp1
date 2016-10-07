@@ -45,8 +45,8 @@ print("input_shape: %s" % (input_shape,))
 
 model = Sequential()
 
-model.add(Convolution1D(nb_filter=64, filter_length=3, activation='relu', border_mode='same', input_shape=input_shape))
-model.add(Convolution1D(nb_filter=64, filter_length=3, activation='relu', border_mode='same', input_shape=input_shape))
+model.add(Convolution1D(nb_filter=32, filter_length=1, activation='relu', border_mode='same', input_shape=input_shape))
+model.add(Convolution1D(nb_filter=32, filter_length=1, activation='relu', border_mode='same', input_shape=input_shape))
 # model.add(Convolution1D(nb_filter=32, filter_length=1, activation='relu', border_mode='same', input_shape=input_shape))
 # model.add(Convolution1D(nb_filter=64, filter_length=1, activation='relu', border_mode='same', input_shape=input_shape))
 # model.add(Convolution1D(nb_filter=128, filter_length=3, activation='relu', border_mode='same', input_shape=input_shape))
@@ -54,12 +54,12 @@ model.add(Convolution1D(nb_filter=64, filter_length=3, activation='relu', border
 
 # model.add(LSTM(4))
 # model.add(TimeDistributed(LSTM(512)))
-model.add(LSTM(256, dropout_W=0.2, dropout_U=0.2, input_shape=input_shape))
+model.add(LSTM(64, dropout_W=0.2, dropout_U=0.2, input_shape=input_shape))
 # model.add(LSTM(64))
 # model.add(GRU(2048))
 
 # model.add(Flatten())
-model.add(Dense(256))
+model.add(Dense(32))
 # model.add(Activation('relu'))
 # model.add(Dropout(0.2))
 # model.add(Dense(1))

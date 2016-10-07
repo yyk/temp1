@@ -28,10 +28,10 @@
       <file leaf-file-name="data2.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+            <state relative-caret-position="585">
+              <caret line="94" column="20" selection-start-line="94" selection-start-column="20" selection-end-line="94" selection-end-column="20" />
               <folding>
-                <marker date="1475815318523" expanded="false" signature="0:92" ph="import ..." />
+                <marker date="1475816281968" expanded="false" signature="0:92" ph="import ..." />
               </folding>
             </state>
           </provider>
@@ -60,8 +60,8 @@
       <file leaf-file-name="train.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/train.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="525">
-              <caret line="47" column="88" selection-start-line="47" selection-start-column="88" selection-end-line="47" selection-end-column="88" />
+            <state relative-caret-position="450">
+              <caret line="48" column="52" selection-start-line="48" selection-start-column="52" selection-end-line="48" selection-end-column="52" />
               <folding>
                 <element signature="e#0#20#0" expanded="true" />
               </folding>
@@ -112,8 +112,8 @@
         <option value="$PROJECT_DIR$/conv1d.py" />
         <option value="$PROJECT_DIR$/data.py" />
         <option value="$PROJECT_DIR$/data1.py" />
-        <option value="$PROJECT_DIR$/train.py" />
         <option value="$PROJECT_DIR$/data2.py" />
+        <option value="$PROJECT_DIR$/train.py" />
       </list>
     </option>
   </component>
@@ -629,18 +629,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/data2.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+        <state relative-caret-position="585">
+          <caret line="94" column="20" selection-start-line="94" selection-start-column="20" selection-end-line="94" selection-end-column="20" />
           <folding>
-            <marker date="1475815318523" expanded="false" signature="0:92" ph="import ..." />
+            <marker date="1475816281968" expanded="false" signature="0:92" ph="import ..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/train.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="525">
-          <caret line="47" column="88" selection-start-line="47" selection-start-column="88" selection-end-line="47" selection-end-column="88" />
+        <state relative-caret-position="450">
+          <caret line="48" column="52" selection-start-line="48" selection-start-column="52" selection-end-line="48" selection-end-column="52" />
           <folding>
             <element signature="e#0#20#0" expanded="true" />
           </folding>

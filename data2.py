@@ -34,13 +34,13 @@ def process(file_path):
     # a['ema150'] = c.ewm(span=150).mean()
 
     # a['roc1'] = roc(c, 1)
-    # a['roc5'] = roc(c, 5)
+    a['roc5'] = roc(c, 5)
     # a['roc25'] = roc(c, 25)
     # a['roc20'] = roc(c, 20)
     # a['roc50'] = roc(c, 50)
 
     # a['vroc1'] = roc(v, 1)
-    # a['vroc5'] = roc(v, 5)
+    a['vroc5'] = roc(v, 5)
     # a['vroc25'] = roc(v, 25)
     # a['vroc20'] = roc(v, 20)
     # a['vroc50'] = roc(v, 50)
@@ -62,7 +62,7 @@ def process(file_path):
     days_to_disgard = 200
     return a.as_matrix(\
            # columns=['date', 'roc5'] \
-           #  columns=['date', 'roc', 'roc' 'macd', 'macds', 'macdh' ] \
+           #  columns=['date', 'roc5', 'vroc5', 'macd', 'macds', 'macdh' ] \
             ).astype('float32')[days_to_disgard:], \
             b.as_matrix()[days_to_disgard:]
 
@@ -91,6 +91,8 @@ def load(file_path):
     y_test = []
     window_size = 100
     for i in range(0, len(a) - window_size):
+        # print(a[0])
+        # sys.exit(0)
         x = a[i: i + window_size][:, 1:]
         # print(x[-6][:2])
         # print(x[-1])
