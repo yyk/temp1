@@ -19,22 +19,32 @@ def process(file_path):
                     usecols=[0, 2, 3, 4, 5, 6], header=None)
     c = a['close']
     v = a['volume']
-    a['sma5'] = c.rolling(window=5).mean()
-    a['sma25'] = c.rolling(window=25).mean()
-    a['sma50'] = c.rolling(window=50).mean()
-    a['sma150'] = c.rolling(window=150).mean()
-    a['ema5'] = c.ewm(span=5).mean()
-    a['ema25'] = c.ewm(span=25).mean()
-    a['ema50'] = c.ewm(span=50).mean()
-    a['ema150'] = c.ewm(span=150).mean()
-    a['roc1'] = roc(c, 1)
-    a['roc5'] = roc(c, 5)
-    a['roc25'] = roc(c, 25)
-    a['roc50'] = roc(c, 50)
-    a['vroc1'] = roc(v, 1)
-    a['vroc5'] = roc(v, 5)
-    a['vroc25'] = roc(v, 25)
-    a['vroc50'] = roc(v, 50)
+
+    # a['sma5'] = c.rolling(window=5).mean()
+    # a['sma20'] = c.rolling(window=20).mean()
+    # a['sma50'] = c.rolling(window=50).mean()
+    # a['sma150'] = c.rolling(window=150).mean()
+
+    # a['msd20'] = c.rolling(window=20).std()
+
+    # a['ema5'] = c.ewm(span=5).mean()
+    # a['ema25'] = c.ewm(span=25).mean()
+    # a['ema20'] = c.ewm(span=20).mean()
+    # a['ema50'] = c.ewm(span=50).mean()
+    # a['ema150'] = c.ewm(span=150).mean()
+
+    # a['roc1'] = roc(c, 1)
+    # a['roc5'] = roc(c, 5)
+    # a['roc25'] = roc(c, 25)
+    # a['roc20'] = roc(c, 20)
+    # a['roc50'] = roc(c, 50)
+
+    # a['vroc1'] = roc(v, 1)
+    # a['vroc5'] = roc(v, 5)
+    # a['vroc25'] = roc(v, 25)
+    # a['vroc20'] = roc(v, 20)
+    # a['vroc50'] = roc(v, 50)
+
     a = macd(a, 12, 26)
 
     a.drop('open', axis=1, inplace=True)
@@ -72,7 +82,6 @@ def macd(a, fast, slow):
     a['macds'] = macd_signal
     a['macdh'] = macd_historgram
     return a
-
 
 def load(file_path):
     a, b = process(file_path)
