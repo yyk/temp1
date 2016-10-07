@@ -41,7 +41,7 @@ def process(file_path):
     # a['roc50'] = roc(c, 50)
 
     # a['vroc1'] = roc(v, 1)
-    # a['vroc5'] = roc(v, 5)
+    a['vroc5'] = roc(v, 5)
     # a['vroc25'] = roc(v, 25)
     # a['vroc20'] = roc(v, 20)
     # a['vroc50'] = roc(v, 50)
