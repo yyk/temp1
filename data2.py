@@ -47,7 +47,9 @@ def process(file_path):
     days_to_disgard = 200
     return a.as_matrix(\
            # columns=['date', 'roc5'] \
-            columns=['date', 'close', 'roc5', 'macd', 'macds', 'macdh'] \
+            columns=['date', 'close', 'roc5',
+                     'macd', 'macds', 'macdh'
+                     ] \
             ).astype('float32')[days_to_disgard:], \
             b.as_matrix()[days_to_disgard:]
 
@@ -77,7 +79,7 @@ def load(file_path):
     y_test = []
     window_size = 10
     for i in range(0, len(a) - window_size):
-        x = a[i: i + window_size][:, 2:3]
+        x = a[i: i + window_size][:, 1:]
         # print(x[-6][:2])
         # print(x[-1])
         x = x.T
