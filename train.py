@@ -1,4 +1,5 @@
 import data2 as data
+import sys
 from keras.callbacks import ModelCheckpoint
 import keras
 from keras.layers.wrappers import TimeDistributed
@@ -13,8 +14,8 @@ from sklearn.metrics import (precision_score, recall_score,
 np.random.seed(1337)  # for reproducibility
 
 model_file = "./checkpoint"
-batch_size = 2048
-# batch_size = 8192
+batch_size = 256
+# batch_size = 131072
 nb_epoch = 10000
 
 X_train, y_train, X_test, y_test = data.load_all()
@@ -36,35 +37,47 @@ print(Y_test.shape)
 input_shape = X_train.shape[1:]
 print("input_shape: %s" % (input_shape,))
 
+# for i in range(10):
+#     print(X_train[i])
+#     print(Y_train[i])
+# sys.exit(0)
+
 model = Sequential()
 
-model.add(Convolution1D(nb_filter=16, filter_length=1, activation='relu', border_mode='same', input_shape=input_shape))
+model.add(Convolution1D(nb_filter=2, filter_length=1, activation='relu', border_mode='same', input_shape=input_shape))
+# model.add(Convolution1D(nb_filter=32, filter_length=1, activation='relu', border_mode='same', input_shape=input_shape))
+# model.add(Convolution1D(nb_filter=32, filter_length=1, activation='relu', border_mode='same', input_shape=input_shape))
 # model.add(Convolution1D(nb_filter=64, filter_length=1, activation='relu', border_mode='same', input_shape=input_shape))
 # model.add(Convolution1D(nb_filter=128, filter_length=1, activation='relu', border_mode='same', input_shape=input_shape))
 # model.add(Convolution1D(nb_filter=128, filter_length=1, activation='relu', border_mode='same', input_shape=input_shape))
 
 # model.add(LSTM(2048))
 # model.add(TimeDistributed(LSTM(512)))
-# model.add(LSTM(512))
-model.add(LSTM(32))
+# model.add(LSTM(8, dropout_W=0.2, dropout_U=0.2, input_shape=input_shape))
+# model.add(LSTM(64))
 # model.add(GRU(2048))
 
-# model.add(Dense(8192))
+model.add(Flatten())
+model.add(Dense(2))
 # model.add(Activation('relu'))
-# model.add(Flatten())
 model.add(Dropout(0.2))
+# model.add(Dense(1))
+# model.add(Activation('sigmoid'))
 model.add(Dense(nb_classes))
 model.add(Activation('softmax'))
 
 model.compile(
         loss='binary_crossentropy',
         optimizer='adadelta',
+#          optimizer='rmsprop',
+#     optimizer='adam',
         metrics=['accuracy'])
 
 # model.load_weights("./checkpoint")
 
 # checkpoint = ModelCheckpoint("./checkpoint", monitor='val_acc', verbose=1, save_best_only=True, mode='max')
-# callbacks_list = [checkpoint]
+# tensorboard = keras.callbacks.TensorBoard()
+callbacks_list = [ ]
 
 highest_precision = 0
 highest = (0,0,0,0)
@@ -73,8 +86,9 @@ for epoch in range(nb_epoch):
             batch_size=batch_size,
             nb_epoch=1,
             verbose=1,
+            shuffle=True,
             validation_data=(X_test, Y_test),
-            # callbacks=callbacks_list)
+            callbacks=callbacks_list
             # class_weight = {
             #     0: 2,
             #     1: 1.0}
