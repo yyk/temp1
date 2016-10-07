@@ -28,9 +28,10 @@ def process(file_path):
     # a['msd5'] = c.rolling(window=5).std()
     # a['msd20'] = c.rolling(window=20).std()
 
-    # a['ema5'] = c.ewm(span=5).mean()
-    # a['ema25'] = c.ewm(span=25).mean()
+    a['ema5'] = c.ewm(span=5).mean()
     # a['ema20'] = c.ewm(span=20).mean()
+    # a['ema25'] = c.ewm(span=25).mean()
+    a['ema35'] = c.ewm(span=35).mean()
     # a['ema50'] = c.ewm(span=50).mean()
     # a['ema150'] = c.ewm(span=150).mean()
 
