@@ -37,8 +37,13 @@ def process(file_path):
     a['vroc50'] = roc(v, 50)
     a = macd(a, 12, 26)
 
+    a.drop('open', axis=1, inplace=True)
+    a.drop('high', axis=1, inplace=True)
+    a.drop('low', axis=1, inplace=True)
+    a.drop('volume', axis=1, inplace=True)
+
 #     b = c.diff(-5).apply(lambda x: 0 if x <=0 else 1)
-    b = c.diff(5).apply(lambda x: 0 if x <= 0 else 1)
+    b = c.diff(-5).apply(lambda x: 0 if x <= 0 else 1)
     # a['diff5'] = b
     # print(a.loc[:, ['close', 'roc5', 'diff5']])
     # sys.exit(0)
@@ -47,9 +52,7 @@ def process(file_path):
     days_to_disgard = 200
     return a.as_matrix(\
            # columns=['date', 'roc5'] \
-            columns=['date', 'close', 'roc5',
-                     'macd', 'macds', 'macdh'
-                     ] \
+           #  columns=['date', 'roc', 'roc' 'macd', 'macds', 'macdh' ] \
             ).astype('float32')[days_to_disgard:], \
             b.as_matrix()[days_to_disgard:]
 
@@ -77,7 +80,7 @@ def load(file_path):
     x_test = []
     y_train = []
     y_test = []
-    window_size = 10
+    window_size = 100
     for i in range(0, len(a) - window_size):
         x = a[i: i + window_size][:, 1:]
         # print(x[-6][:2])
