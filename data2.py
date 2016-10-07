@@ -45,7 +45,7 @@ def process(file_path):
     # a['vroc20'] = roc(v, 20)
     # a['vroc50'] = roc(v, 50)
 
-    # a = macd(a, 12, 26)
+    a = macd(a, 12, 26)
 
     a.drop('open', axis=1, inplace=True)
     a.drop('high', axis=1, inplace=True)
