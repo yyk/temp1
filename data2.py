@@ -40,12 +40,12 @@ def process(file_path):
     # a['roc50'] = roc(c, 50)
 
     # a['vroc1'] = roc(v, 1)
-    a['vroc5'] = roc(v, 5)
+    # a['vroc5'] = roc(v, 5)
     # a['vroc25'] = roc(v, 25)
     # a['vroc20'] = roc(v, 20)
     # a['vroc50'] = roc(v, 50)
 
-    a = macd(a, 12, 26)
+    # a = macd(a, 12, 26)
 
     a.drop('open', axis=1, inplace=True)
     a.drop('high', axis=1, inplace=True)
@@ -53,7 +53,7 @@ def process(file_path):
     a.drop('volume', axis=1, inplace=True)
 
 #     b = c.diff(-5).apply(lambda x: 0 if x <=0 else 1)
-    b = c.diff(-5).apply(lambda x: 0 if x <= 0 else 1)
+    b = c.diff(5).apply(lambda x: 0 if x <= 0 else 1)
     # a['diff5'] = b
     # print(a.loc[:, ['close', 'roc5', 'diff5']])
     # sys.exit(0)
