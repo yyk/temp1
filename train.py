@@ -14,8 +14,8 @@ from sklearn.metrics import (precision_score, recall_score,
 np.random.seed(1337)  # for reproducibility
 
 model_file = "./checkpoint"
-# batch_size = 256
-batch_size = 1024
+batch_size = 512
+# batch_size = 1024
 # batch_size = 131072
 nb_epoch = 10000
 
@@ -54,7 +54,7 @@ model.add(Convolution1D(nb_filter=32, filter_length=1, activation='relu', border
 
 # model.add(LSTM(4))
 # model.add(TimeDistributed(LSTM(512)))
-model.add(LSTM(64, dropout_W=0.2, dropout_U=0.2, input_shape=input_shape))
+model.add(LSTM(8, dropout_W=0.2, dropout_U=0.2))
 # model.add(LSTM(64))
 # model.add(GRU(2048))
 

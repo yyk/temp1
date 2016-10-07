@@ -34,7 +34,7 @@ def process(file_path):
     # a['ema150'] = c.ewm(span=150).mean()
 
     # a['roc1'] = roc(c, 1)
-    a['roc5'] = roc(c, 5)
+    # a['roc5'] = roc(c, 5)
     # a['roc25'] = roc(c, 25)
     # a['roc20'] = roc(c, 20)
     # a['roc50'] = roc(c, 50)
@@ -50,10 +50,10 @@ def process(file_path):
     a.drop('open', axis=1, inplace=True)
     a.drop('high', axis=1, inplace=True)
     a.drop('low', axis=1, inplace=True)
+    a.drop('close', axis=1, inplace=True)
     a.drop('volume', axis=1, inplace=True)
 
-#     b = c.diff(-5).apply(lambda x: 0 if x <=0 else 1)
-    b = c.diff(5).apply(lambda x: 0 if x <= 0 else 1)
+    b = c.diff(-5).apply(lambda x: 0 if x <= 0 else 1)
     # a['diff5'] = b
     # print(a.loc[:, ['close', 'roc5', 'diff5']])
     # sys.exit(0)
