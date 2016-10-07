@@ -34,14 +34,14 @@ def process(file_path):
     # a['ema50'] = c.ewm(span=50).mean()
     # a['ema150'] = c.ewm(span=150).mean()
 
-    # a['roc1'] = roc(c, 1)
+    a['roc1'] = roc(c, 1)
     a['roc5'] = roc(c, 5)
     # a['roc25'] = roc(c, 25)
     # a['roc20'] = roc(c, 20)
     # a['roc50'] = roc(c, 50)
 
     # a['vroc1'] = roc(v, 1)
-    a['vroc5'] = roc(v, 5)
+    # a['vroc5'] = roc(v, 5)
     # a['vroc25'] = roc(v, 25)
     # a['vroc20'] = roc(v, 20)
     # a['vroc50'] = roc(v, 50)

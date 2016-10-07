@@ -70,9 +70,9 @@ model.add(Activation('softmax'))
 
 model.compile(
         loss='binary_crossentropy',
-        optimizer='adadelta',
+        # optimizer='adadelta',
 #          optimizer='rmsprop',
-#     optimizer='adam',
+    optimizer='adam',
         metrics=['accuracy'])
 
 # model.load_weights("./checkpoint")
