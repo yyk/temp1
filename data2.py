@@ -25,6 +25,7 @@ def process(file_path):
     # a['sma50'] = c.rolling(window=50).mean()
     # a['sma150'] = c.rolling(window=150).mean()
 
+    # a['msd5'] = c.rolling(window=5).std()
     # a['msd20'] = c.rolling(window=20).std()
 
     # a['ema5'] = c.ewm(span=5).mean()
@@ -34,7 +35,7 @@ def process(file_path):
     # a['ema150'] = c.ewm(span=150).mean()
 
     # a['roc1'] = roc(c, 1)
-    # a['roc5'] = roc(c, 5)
+    a['roc5'] = roc(c, 5)
     # a['roc25'] = roc(c, 25)
     # a['roc20'] = roc(c, 20)
     # a['roc50'] = roc(c, 50)

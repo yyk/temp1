@@ -18,6 +18,7 @@ batch_size = 512
 # batch_size = 1024
 # batch_size = 131072
 nb_epoch = 10000
+init='normal'
 
 X_train, y_train, X_test, y_test = data.load_all()
 nb_classes = 2
@@ -45,7 +46,7 @@ print("input_shape: %s" % (input_shape,))
 
 model = Sequential()
 
-model.add(Convolution1D(nb_filter=32, filter_length=1, activation='relu', border_mode='same', input_shape=input_shape))
+model.add(Convolution1D(nb_filter=32, filter_length=1, activation='relu', border_mode='valid', input_shape=input_shape, init=init))
 # model.add(Convolution1D(nb_filter=32, filter_length=1, activation='relu', border_mode='same', input_shape=input_shape))
 # model.add(Convolution1D(nb_filter=32, filter_length=1, activation='relu', border_mode='same', input_shape=input_shape))
 # model.add(Convolution1D(nb_filter=64, filter_length=1, activation='relu', border_mode='same', input_shape=input_shape))
@@ -54,12 +55,12 @@ model.add(Convolution1D(nb_filter=32, filter_length=1, activation='relu', border
 
 # model.add(LSTM(4))
 # model.add(TimeDistributed(LSTM(512)))
-model.add(LSTM(8, dropout_W=0.2, dropout_U=0.2))
+model.add(LSTM(8, dropout_W=0.2, dropout_U=0.2, init=init))
 # model.add(LSTM(64))
 # model.add(GRU(2048))
 
 # model.add(Flatten())
-model.add(Dense(32))
+model.add(Dense(32, init=init))
 # model.add(Activation('relu'))
 # model.add(Dropout(0.2))
 # model.add(Dense(1))
