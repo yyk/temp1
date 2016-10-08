@@ -54,13 +54,12 @@ def process(file_path):
     # a.drop('high', axis=1, inplace=True)
     # a.drop('low', axis=1, inplace=True)
     # a.drop('close', axis=1, inplace=True)
-    a.drop('volume', axis=1, inplace=True)
+    # a.drop('volume', axis=1, inplace=True)
 
-    # b = c.ewm(span=12).mean() - c.ewm(span=26).mean()
-    # b = c.ewm(span=5).mean()
-    # b = c.ewm(span=5).mean()
+    b = c.ewm(span=12).mean() - c.ewm(span=26).mean()
+    # b = c.ewm(span=26).mean()
     # b = roc(c,5)
-    b = c.diff(-5).apply(lambda x: 0 if x <= 0 else 1)
+    # b = c.diff(-5).apply(lambda x: 0 if x <= 0 else 1)
     # a['diff5'] = b
     # print(a.loc[:, ['close', 'roc5', 'diff5']])
     # sys.exit(0)
@@ -105,6 +104,7 @@ def load(file_path):
         # print(x[-1])
         # x = x.T
         y = b[i + window_size -1]
+        # y = b[i: i + window_size]
         last_date = a[i+window_size][0]
         # print(y)
         # print(last_date)

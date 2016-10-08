@@ -14,7 +14,7 @@ from sklearn.metrics import (precision_score, recall_score,
 np.random.seed(1337)  # for reproducibility
 
 model_file = "./checkpoint"
-batch_size = 256
+batch_size = 512
 # batch_size = 1024
 # batch_size = 131072
 nb_epoch = 10000
@@ -61,7 +61,8 @@ model = Sequential()
 # model.add(LSTM(4))
 # model.add(TimeDistributed(LSTM(512)))
 model.add(LSTM(128, dropout_W=0.2, dropout_U=0.2, init=init, consume_less='gpu',
-               input_dim=dimension, input_length=length
+               input_dim=dimension, input_length=length,
+               # return_sequences=True,
                ))
 # model.add(LSTM(64))
 # model.add(GRU(2048))
