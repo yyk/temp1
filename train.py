@@ -14,8 +14,8 @@ from sklearn.metrics import (precision_score, recall_score,
 np.random.seed(1337)  # for reproducibility
 
 model_file = "./checkpoint"
-batch_size = 512
-# batch_size = 1024
+# batch_size = 512
+batch_size = 1024
 # batch_size = 131072
 nb_epoch = 10000
 init='normal'
@@ -23,10 +23,10 @@ init='normal'
 X_train, y_train, X_test, y_test = data.load_all()
 nb_classes = 2
 
-Y_train = y_train
-Y_test = y_test
-# Y_train = np_utils.to_categorical(np.array(y_train), 2)
-# Y_test = np_utils.to_categorical(np.array(y_test), 2)
+# Y_train = y_train
+# Y_test = y_test
+Y_train = np_utils.to_categorical(np.array(y_train), 2)
+Y_test = np_utils.to_categorical(np.array(y_test), 2)
 
 # input image dimensions
 length = X_train.shape[2]
@@ -50,7 +50,7 @@ print("input_shape: %s" % (input_shape,))
 
 model = Sequential()
 
-# model.add(Convolution1D(nb_filter=32, filter_length=1, activation='relu', border_mode='valid', init=init, input_dim=dimension, input_length=length))
+model.add(Convolution1D(nb_filter=32, filter_length=1, activation='relu', border_mode='valid', init=init, input_dim=dimension, input_length=length))
 # model.add(Convolution1D(nb_filter=32, filter_length=1, activation='relu', border_mode='valid'))
 # model.add(Convolution1D(nb_filter=32, filter_length=1, activation='relu', border_mode='same', input_shape=input_shape))
 # model.add(Convolution1D(nb_filter=64, filter_length=1, activation='relu', border_mode='same'))
@@ -60,28 +60,28 @@ model = Sequential()
 
 # model.add(LSTM(4))
 # model.add(TimeDistributed(LSTM(512)))
-model.add(LSTM(32, dropout_W=0.2, dropout_U=0.2, init=init, consume_less='gpu',
+model.add(GRU(32, dropout_W=0.2, dropout_U=0.2, init=init, consume_less='gpu',
                input_dim=dimension, input_length=length,
                return_sequences=True,
                ))
-model.add(LSTM(32, init=init, return_sequences=True))
-model.add(LSTM(32, init=init))
+# model.add(GRU(32, init=init, return_sequences=True))
+model.add(GRU(32, init=init))
 # model.add(GRU(2048))
 
 # model.add(Flatten())
-model.add(Dense(128, init=init))
+model.add(Dense(256, init=init))
 # model.add(Activation('relu'))
 # model.add(Dropout(0.2))
-model.add(Dense(1))
+# model.add(Dense(1))
 # model.add(Dense(length))
 # model.add(Activation('sigmoid'))
-# model.add(Dense(nb_classes))
-# model.add(Activation('softmax'))
+model.add(Dense(nb_classes))
+model.add(Activation('softmax'))
 # model.add(Dense(2))
 
 model.compile(
-        # loss='binary_crossentropy',
-         loss='mse',
+        loss='binary_crossentropy',
+         # loss='mse',
         # optimizer='adadelta',
 #          optimizer='rmsprop',
     optimizer='adam',
@@ -132,11 +132,12 @@ for epoch in range(nb_epoch):
     # for category, (x, y) in tests.items():
     #     score = model.evaluate(x, y, verbose=0, batch_size=batch_size)
     #     print(' [%d] score: %f\taccuracy: %f' % (category, score[0], score[1]))
+    model.save(model_file + ".backup", overwrite=True)
     if precision > highest_precision and recall > 0.01:
         print("Precision increased from {} to {}, saving model to {}".format(highest_precision, precision, model_file))
         highest_precision = precision
         highest = (accuracy, recall, precision, f1)
-        model.save(model_file, overwrite=True)
+        model.save(model_file + ".best", overwrite=True)
     else:
         print("Precision didn't increase, current highest accuracy {} recall {} precision {} f1 {}".format(highest[0],
                                                                                                            highest[1],
