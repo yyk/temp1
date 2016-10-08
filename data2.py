@@ -18,6 +18,7 @@ def process(file_path):
     a = pd.read_csv(file_path, names=['date', 'unknown', 'open', 'high', 'low', 'close', 'volume'],
                     usecols=[0, 2, 3, 4, 5, 6], header=None)
     c = a['close']
+    a['volume'] /= 1000000
     v = a['volume']
 
     # a['sma5'] = c.rolling(window=5).mean()
@@ -35,7 +36,7 @@ def process(file_path):
     # a['ema50'] = c.ewm(span=50).mean()
     # a['ema150'] = c.ewm(span=150).mean()
 
-    a['roc1'] = roc(c, 1)
+    # a['roc1'] = roc(c, 1)
     # a['roc5'] = roc(c, 5)
     # a['roc25'] = roc(c, 25)
     # a['roc20'] = roc(c, 20)
@@ -47,17 +48,19 @@ def process(file_path):
     # a['vroc20'] = roc(v, 20)
     # a['vroc50'] = roc(v, 50)
 
-#     a = macd(a, 12, 26)
+    # a = macd(a, 12, 26)
 
-    a.drop('open', axis=1, inplace=True)
-    a.drop('high', axis=1, inplace=True)
-    a.drop('low', axis=1, inplace=True)
-    a.drop('close', axis=1, inplace=True)
+    # a.drop('open', axis=1, inplace=True)
+    # a.drop('high', axis=1, inplace=True)
+    # a.drop('low', axis=1, inplace=True)
+    # a.drop('close', axis=1, inplace=True)
     a.drop('volume', axis=1, inplace=True)
 
-    # b = c.rolling(window=5).mean()
+    # b = c.ewm(span=12).mean() - c.ewm(span=26).mean()
+    # b = c.ewm(span=5).mean()
+    # b = c.ewm(span=5).mean()
     # b = roc(c,5)
-    b = c.diff(50).apply(lambda x: 0 if x <= 0 else 1)
+    b = c.diff(-5).apply(lambda x: 0 if x <= 0 else 1)
     # a['diff5'] = b
     # print(a.loc[:, ['close', 'roc5', 'diff5']])
     # sys.exit(0)
@@ -80,7 +83,7 @@ def macd(a, fast, slow):
     ema_fast = prices.ewm(fast).mean()
     ema_slow = prices.ewm(slow).mean()
     macd = ema_fast - ema_slow
-    macd_signal = prices.ewm(9).mean()
+    macd_signal = macd.ewm(9).mean()
     macd_historgram = macd - macd_signal
     a['macd'] = macd
     a['macds'] = macd_signal
