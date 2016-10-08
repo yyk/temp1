@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="76af9473-13a9-4df0-b340-59c0576d4341" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/checkpoint" afterPath="$PROJECT_DIR$/checkpoint" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data2.py" afterPath="$PROJECT_DIR$/data2.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/train.py" afterPath="$PROJECT_DIR$/train.py" />
     </list>
@@ -23,18 +24,6 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="data2.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/data2.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="375">
-              <caret line="37" column="23" selection-start-line="37" selection-start-column="23" selection-end-line="37" selection-end-column="23" />
-              <folding>
-                <element signature="e#0#19#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="window.py" pinned="false" current-in-tab="false">
         <entry file="file://$USER_HOME$/tensorflow3/lib/python3.5/site-packages/pandas/core/window.py">
           <provider selected="true" editor-type-id="text-editor">
@@ -48,8 +37,28 @@
       <file leaf-file-name="frame.py" pinned="false" current-in-tab="false">
         <entry file="file://$USER_HOME$/tensorflow3/lib/python3.5/site-packages/pandas/core/frame.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="15">
+            <state relative-caret-position="59010">
               <caret line="4021" column="8" selection-start-line="4021" selection-start-column="8" selection-end-line="4021" selection-end-column="8" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="recurrent.py" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/tensorflow3/lib/python3.5/site-packages/keras/layers/recurrent.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="570">
+              <caret line="96" column="12" selection-start-line="96" selection-start-column="12" selection-end-line="96" selection-end-column="12" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="convolutional.py" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/tensorflow3/lib/python3.5/site-packages/keras/layers/convolutional.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="435">
+              <caret line="63" column="8" selection-start-line="63" selection-start-column="8" selection-end-line="63" selection-end-column="8" />
               <folding />
             </state>
           </provider>
@@ -58,29 +67,23 @@
       <file leaf-file-name="train.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/train.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
-              <folding />
+            <state relative-caret-position="660">
+              <caret line="61" column="16" selection-start-line="61" selection-start-column="16" selection-end-line="61" selection-end-column="16" />
+              <folding>
+                <element signature="e#0#20#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="models.py" pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/tensorflow3/lib/python3.5/site-packages/keras/models.py">
+      <file leaf-file-name="data2.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/data2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="8145">
-              <caret line="555" column="8" selection-start-line="555" selection-start-column="8" selection-end-line="555" selection-end-column="8" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="imdb_lstm.py" pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/github/keras/examples/imdb_lstm.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="375">
-              <caret line="26" column="0" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
-              <folding />
+            <state relative-caret-position="510">
+              <caret line="59" column="16" selection-start-line="59" selection-start-column="16" selection-end-line="59" selection-end-column="16" />
+              <folding>
+                <element signature="e#0#19#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -498,7 +501,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -537,7 +542,6 @@
     <entry file="file://$USER_HOME$/.PyCharm2016.2/system/python_stubs/523847468/numpy/core/multiarray.py" />
     <entry file="file://$USER_HOME$/github/keras/keras/datasets/cifar10.py" />
     <entry file="file://$USER_HOME$/github/keras/examples/mnist_cnn.py" />
-    <entry file="file://$USER_HOME$/tensorflow3/lib/python3.5/site-packages/keras/layers/convolutional.py" />
     <entry file="file://$USER_HOME$/tensorflow3/lib/python3.5/site-packages/keras/utils/np_utils.py" />
     <entry file="file://$USER_HOME$/github/keras/keras/datasets/cifar.py" />
     <entry file="file://$USER_HOME$/github/keras/keras/layers/recurrent.py" />
@@ -555,7 +559,6 @@
     <entry file="file://$USER_HOME$/tensorflow3/lib/python3.5/site-packages/numpy/core/numeric.py" />
     <entry file="file://$USER_HOME$/tensorflow3/lib/python3.5/site-packages/keras/engine/training.py" />
     <entry file="file://$USER_HOME$/github/keras/examples/imdb_cnn.py" />
-    <entry file="file://$USER_HOME$/tensorflow3/lib/python3.5/site-packages/keras/layers/recurrent.py" />
     <entry file="file://$USER_HOME$/.PyCharm2016.2/system/python_stubs/523847468/posix.py" />
     <entry file="file://$PROJECT_DIR$/data.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -572,10 +575,18 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/github/keras/examples/imdb_lstm.py">
+    <entry file="file://$USER_HOME$/tensorflow3/lib/python3.5/site-packages/pandas/core/window.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="375">
-          <caret line="26" column="0" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
+        <state relative-caret-position="339">
+          <caret line="1124" column="37" selection-start-line="1124" selection-start-column="37" selection-end-line="1124" selection-end-column="37" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/tensorflow3/lib/python3.5/site-packages/pandas/core/frame.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="59010">
+          <caret line="4021" column="8" selection-start-line="4021" selection-start-column="8" selection-end-line="4021" selection-end-column="8" />
           <folding />
         </state>
       </provider>
@@ -588,34 +599,44 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/tensorflow3/lib/python3.5/site-packages/pandas/core/frame.py">
+    <entry file="file://$USER_HOME$/github/keras/examples/imdb_lstm.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="4021" column="8" selection-start-line="4021" selection-start-column="8" selection-end-line="4021" selection-end-column="8" />
+        <state relative-caret-position="375">
+          <caret line="26" column="0" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/tensorflow3/lib/python3.5/site-packages/pandas/core/window.py">
+    <entry file="file://$USER_HOME$/tensorflow3/lib/python3.5/site-packages/keras/layers/convolutional.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="339">
-          <caret line="1124" column="37" selection-start-line="1124" selection-start-column="37" selection-end-line="1124" selection-end-column="37" />
+        <state relative-caret-position="435">
+          <caret line="63" column="8" selection-start-line="63" selection-start-column="8" selection-end-line="63" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/tensorflow3/lib/python3.5/site-packages/keras/layers/recurrent.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="570">
+          <caret line="96" column="12" selection-start-line="96" selection-start-column="12" selection-end-line="96" selection-end-column="12" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/train.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
-          <folding />
+        <state relative-caret-position="660">
+          <caret line="61" column="16" selection-start-line="61" selection-start-column="16" selection-end-line="61" selection-end-column="16" />
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/data2.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="375">
-          <caret line="37" column="23" selection-start-line="37" selection-start-column="23" selection-end-line="37" selection-end-column="23" />
+        <state relative-caret-position="510">
+          <caret line="59" column="16" selection-start-line="59" selection-start-column="16" selection-end-line="59" selection-end-column="16" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>

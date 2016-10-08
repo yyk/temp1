@@ -28,15 +28,15 @@ def process(file_path):
     # a['msd5'] = c.rolling(window=5).std()
     # a['msd20'] = c.rolling(window=20).std()
 
-    a['ema5'] = c.ewm(span=5).mean()
+#     a['ema5'] = c.ewm(span=5).mean()
     # a['ema20'] = c.ewm(span=20).mean()
-    # a['ema25'] = c.ewm(span=25).mean()
-    a['ema35'] = c.ewm(span=35).mean()
+#     a['ema25'] = c.ewm(span=25).mean()
+#     a['ema35'] = c.ewm(span=35).mean()
     # a['ema50'] = c.ewm(span=50).mean()
     # a['ema150'] = c.ewm(span=150).mean()
 
     a['roc1'] = roc(c, 1)
-    a['roc5'] = roc(c, 5)
+    # a['roc5'] = roc(c, 5)
     # a['roc25'] = roc(c, 25)
     # a['roc20'] = roc(c, 20)
     # a['roc50'] = roc(c, 50)
@@ -47,7 +47,7 @@ def process(file_path):
     # a['vroc20'] = roc(v, 20)
     # a['vroc50'] = roc(v, 50)
 
-    a = macd(a, 12, 26)
+#     a = macd(a, 12, 26)
 
     a.drop('open', axis=1, inplace=True)
     a.drop('high', axis=1, inplace=True)
@@ -55,7 +55,9 @@ def process(file_path):
     a.drop('close', axis=1, inplace=True)
     a.drop('volume', axis=1, inplace=True)
 
-    b = c.diff(-5).apply(lambda x: 0 if x <= 0 else 1)
+    # b = c.rolling(window=5).mean()
+    # b = roc(c,5)
+    b = c.diff(50).apply(lambda x: 0 if x <= 0 else 1)
     # a['diff5'] = b
     # print(a.loc[:, ['close', 'roc5', 'diff5']])
     # sys.exit(0)
@@ -98,7 +100,7 @@ def load(file_path):
         x = a[i: i + window_size][:, 1:]
         # print(x[-6][:2])
         # print(x[-1])
-        x = x.T
+        # x = x.T
         y = b[i + window_size -1]
         last_date = a[i+window_size][0]
         # print(y)
