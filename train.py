@@ -60,18 +60,20 @@ model = Sequential()
 
 # model.add(LSTM(4))
 # model.add(TimeDistributed(LSTM(512)))
-model.add(LSTM(128, dropout_W=0.2, dropout_U=0.2, init=init, consume_less='gpu',
+model.add(LSTM(32, dropout_W=0.2, dropout_U=0.2, init=init, consume_less='gpu',
                input_dim=dimension, input_length=length,
-               # return_sequences=True,
+               return_sequences=True,
                ))
-# model.add(LSTM(64))
+model.add(LSTM(32, init=init, return_sequences=True))
+model.add(LSTM(32, init=init))
 # model.add(GRU(2048))
 
 # model.add(Flatten())
-model.add(Dense(32, init=init))
+model.add(Dense(128, init=init))
 # model.add(Activation('relu'))
 # model.add(Dropout(0.2))
 model.add(Dense(1))
+# model.add(Dense(length))
 # model.add(Activation('sigmoid'))
 # model.add(Dense(nb_classes))
 # model.add(Activation('softmax'))
@@ -80,16 +82,16 @@ model.add(Dense(1))
 model.compile(
         # loss='binary_crossentropy',
          loss='mse',
-        optimizer='adadelta',
+        # optimizer='adadelta',
 #          optimizer='rmsprop',
-#     optimizer='adam',
+    optimizer='adam',
         metrics=['accuracy'])
 
 # model.load_weights("./checkpoint")
 
 # checkpoint = ModelCheckpoint("./checkpoint", monitor='val_acc', verbose=1, save_best_only=True, mode='max')
-# tensorboard = keras.callbacks.TensorBoard()
-callbacks_list = [ ]
+tensorboard = keras.callbacks.TensorBoard()
+callbacks_list = [ tensorboard ]
 
 highest_precision = 0
 highest = (0,0,0,0)

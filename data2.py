@@ -56,9 +56,9 @@ def process(file_path):
     # a.drop('close', axis=1, inplace=True)
     # a.drop('volume', axis=1, inplace=True)
 
-    b = c.ewm(span=12).mean() - c.ewm(span=26).mean()
+    # b = c.ewm(span=12).mean() - c.ewm(span=26).mean()
     # b = c.ewm(span=26).mean()
-    # b = roc(c,5)
+    b = roc(c,5)
     # b = c.diff(-5).apply(lambda x: 0 if x <= 0 else 1)
     # a['diff5'] = b
     # print(a.loc[:, ['close', 'roc5', 'diff5']])
@@ -74,7 +74,7 @@ def process(file_path):
 
 
 def roc(prices, days):
-    return prices.diff(days) / prices.shift(days)
+    return (prices.diff(days) / prices.shift(days)) * 100
 
 
 def macd(a, fast, slow):
