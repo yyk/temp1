@@ -113,18 +113,21 @@ def print_precision(class_number, preditions, y_test):
         percent = int(len(preditions) * percentage)
         p = preditions.argsort()[-percent:]
         precision = np.count_nonzero(y_test[p]) / len(p)
-        print("Class %d at top %f%% precision %f" % (class_number, percentage * 100, precision))
+        print("Class %d at top %1f%% precision %f" % (class_number, percentage * 100, precision))
 
 for epoch in range(nb_epoch):
     # print(get_prediction(inputs=[X_test[:10], 0]))
     model.pop()
     y_pred = model.predict(X_test, batch_size=batch_size * 3).T
+    print(y_pred[0][:20])
+    print(y_pred[1][:20])
 
     print_precision(0, y_pred[0], y_test)
+    print('-----------------------------')
     print_precision(1, y_pred[1], y_test)
 
-
     print('epoch {}'.format(str(epoch)))
+    model.add(Activation('softmax'))
     model.fit(X_train, Y_train,
             batch_size=batch_size,
             nb_epoch=1,
