@@ -49,8 +49,8 @@ def process(file_path):
     # a['ema50'] = c.ewm(span=50).mean()
     # a['ema150'] = c.ewm(span=150).mean()
 
-    a['roc1'] = roc(c, 1)
-    a['roc5'] = roc(c, 5)
+    # a['roc1'] = roc(c, 1)
+    # a['roc5'] = roc(c, 5)
     # a['roc25'] = roc(c, 25)
     # a['roc20'] = roc(c, 20)
     # a['roc50'] = roc(c, 50)
@@ -87,14 +87,16 @@ def process(file_path):
 
 
 def roc(prices, days):
-    return (prices.diff(days) / prices.shift(days))
+    return prices.pct_change(periods=days)
 
 
 def macd(a, fast, slow):
     prices = a['close']
+    average = prices.mean()
     ema_fast = prices.ewm(fast).mean()
     ema_slow = prices.ewm(slow).mean()
-    macd = ema_fast - ema_slow
+    # normalize them
+    macd = ((ema_fast - ema_slow) / average) * 100
     macd_signal = macd.ewm(9).mean()
     macd_historgram = macd - macd_signal
     a['macd'] = macd
