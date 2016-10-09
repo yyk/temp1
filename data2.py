@@ -62,6 +62,7 @@ def process(file_path):
     # a['vroc50'] = roc(v, 50)
 
     a = macd(a, 12, 26)
+    a['rsi'] = rsi(a['close'])
 
     a.drop('open', axis=1, inplace=True)
     a.drop('high', axis=1, inplace=True)
@@ -103,6 +104,21 @@ def macd(a, fast, slow):
     a['macds'] = macd_signal
     a['macdh'] = macd_historgram
     return a
+
+def rsi(series, period=14):
+    """
+    http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:relative_strength_index_rsi
+    """
+    diff = series.diff(1) # diff against previous day
+    gain = diff.apply(lambda x: x if x > 0 else 0) # gain against previous day
+    loss = diff.apply(lambda x: -x if x < 0 else 0) # loss against previous day (as positive value)
+    first_average_gain = gain.rolling(window=period).mean() # average gain in previous 14 days
+    first_average_loss = loss.mean() # average loss in previous 14 days
+
+    average_gain = (first_average_gain.shift(1) * (period - 1) + gain) / period
+    average_loss = (first_average_loss.shift(1) * (period - 1) + loss) / period
+
+    return 100 - 100 / (1 + average_gain / average_loss)
 
 def load(file_path):
     a, b = process(file_path)
