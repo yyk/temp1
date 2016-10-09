@@ -67,7 +67,7 @@ model.add(Convolution1D(nb_filter=32, filter_length=1, activation='relu', border
 # model.add(LSTM(4))
 # model.add(TimeDistributed(LSTM(512)))
 model.add(GRU(32, dropout_W=0.2, dropout_U=0.2, init=init, consume_less='gpu',
-               input_dim=dimension, input_length=length,
+               # input_dim=dimension, input_length=length,
                return_sequences=True,
                ))
 # model.add(GRU(32, init=init, return_sequences=True))

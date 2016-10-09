@@ -1,5 +1,5 @@
 import pandas as pd
-from multiprocessing.pool import ThreadPool
+from multiprocessing.pool import Pool
 import threading
 import numpy as np
 import os
@@ -7,8 +7,9 @@ import sys
 
 np.set_printoptions(precision=4, suppress=True)
 
+version = 1
 source_root = "./quantquote_daily_sp500/daily/"
-output_root = "./quantquote_daily_sp500/generated/"
+output_root = "./quantquote_daily_sp500/generated/%d/" % version
 x_train_file = output_root + "x_train"
 y_train_file = output_root + "y_train"
 x_test_file = output_root + "x_test"
@@ -35,7 +36,7 @@ def process(file_path):
     a['volume'] /= 1000000
     v = a['volume']
 
-    # a['sma%d' % window_size] = c.rolling(window=window_size).mean()
+    a['sma%d' % window_size] = c.rolling(window=window_size).mean()
     # a['sma5'] = c.rolling(window=5).mean()
     # a['sma20'] = c.rolling(window=20).mean()
     # a['sma50'] = c.rolling(window=50).mean()
@@ -115,27 +116,30 @@ def rsi(series, period=14):
     return result
 
 def load(file_path):
+    global global_number_of_file_loaded
     a, b = process(file_path)
-    print("Loading " + file_path)
+    print("Loading %s" % (file_path, ))
     x_train = []
     x_test = []
     y_train = []
     y_test = []
 
-    for column in ['open', 'high', 'low', 'close', 'volume']:
+    for column in ['open', 'high', 'low', 'volume']:
         a.drop(column, axis=1, inplace=True)
     for i in range(0, len(a) - window_size):
         # print(a[0])
         # sys.exit(0)
-        x = a.iloc[i: i + window_size]
+        x = a.iloc[i: i + window_size].copy()
         y = b.iloc[i + window_size - 1]
         last_date = x.iloc[-1]['date']
 
-        # x['macd'] = x['macd'] / x['sma%d' % window_size].iloc[-1] * 100
-        # macd = x['macd']
-        # x['macds'] = macd.ewm(9).mean()
-        # x['macdh'] = macd - macd.ewm(9).mean()
+        x['macd'] = x['macd'] / x['sma%d' % window_size].iloc[-1] * 100
+        macd = x['macd']
+        x['macds'] = macd.ewm(9).mean()
+        x['macdh'] = macd - macd.ewm(9).mean()
 
+        for column in ['date', 'close', 'sma%d' % window_size]:
+            x.drop(column, axis=1, inplace=True)
 
         x = x.as_matrix().astype('float32')
         if last_date > 20120101:
@@ -147,11 +151,13 @@ def load(file_path):
     return x_train, y_train, x_test, y_test
 
 
-def gen_all():
+def gen_all(test=False):
     fs = os.listdir(source_root)
-    #   fs = fs[:5]
+    if test:
+        print("Only testing with 5 files")
+        fs = fs[:5]
     async_results = []
-    pool = ThreadPool(processes=1)
+    pool = Pool(processes=12)
     for f in fs:
         async_results.append(pool.apply_async(load, (source_root + f,)))
 
@@ -197,8 +203,7 @@ if __name__ == '__main__':
     #     c1 += x1
     # print(c0/(c0+c1), c1/(c0+c1))
 
-
-    x_train, y_train, x_test, y_test = gen_all()
+    x_train, y_train, x_test, y_test = gen_all(len(sys.argv) > 1 and sys.argv[1] == 'test')
     #   print(x_test.dtype)
 
     # print("Shuffling")
@@ -210,8 +215,9 @@ if __name__ == '__main__':
     # y_test = y_test[s]
 
     print("Start writing")
-    # print(x_train.shape)
-    #
+    if not os.path.exists(output_root):
+        os.mkdir(output_root)
+    print(x_train.shape)
     np.save(x_train_file, x_train)
     print(y_train.shape)
     np.save(y_train_file, y_train)
