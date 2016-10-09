@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from keras.utils import np_utils
 import os
 import sys
 
@@ -64,11 +63,6 @@ def process(file_path):
     a = macd(a, 12, 26)
     a['rsi14'] = rsi(a['close'], period=14)
 
-    a.drop('open', axis=1, inplace=True)
-    a.drop('high', axis=1, inplace=True)
-    a.drop('low', axis=1, inplace=True)
-    a.drop('close', axis=1, inplace=True)
-    a.drop('volume', axis=1, inplace=True)
 
     # b = c.ewm(span=12).mean() - c.ewm(span=26).mean()
     # b = c.ewm(span=26).mean()
@@ -80,11 +74,8 @@ def process(file_path):
 
     # discard the first 200 days.
     days_to_disgard = 200
-    return a.as_matrix(\
-           # columns=['date', 'roc5'] \
-           #  columns=['date', 'roc5', 'vroc5', 'macd', 'macds', 'macdh' ] \
-            ).astype('float32')[days_to_disgard:], \
-            b.as_matrix()[days_to_disgard:]
+    # return a.as_matrix().astype('float32')[days_to_disgard:], b.as_matrix()[days_to_disgard:]
+    return a[days_to_disgard:], b[days_to_disgard:]
 
 
 def roc(prices, days):
@@ -93,16 +84,12 @@ def roc(prices, days):
 
 def macd(a, fast, slow):
     prices = a['close']
-    average = prices.mean()
+    # average = prices.mean()
     ema_fast = prices.ewm(fast).mean()
     ema_slow = prices.ewm(slow).mean()
     # normalize them
-    macd = ((ema_fast - ema_slow) / average) * 100
-    macd_signal = macd.ewm(9).mean()
-    macd_historgram = macd - macd_signal
+    macd = ema_fast - ema_slow
     a['macd'] = macd
-    a['macds'] = macd_signal
-    a['macdh'] = macd_historgram
     return a
 
 def rsi(series, period=14):
@@ -132,17 +119,24 @@ def load(file_path):
     for i in range(0, len(a) - window_size):
         # print(a[0])
         # sys.exit(0)
-        x = a[i: i + window_size][:, 1:]
-        # print(x)
-        # sys.exit(0)
-        # print(x[-6][:2])
-        # print(x[-1])
-        # x = x.T
-        y = b[i + window_size -1]
-        # y = b[i: i + window_size]
-        last_date = a[i+window_size][0]
-        # print(y)
-        # print(last_date)
+        x = a.iloc[i: i + window_size].copy()
+        y = b.iloc[i + window_size - 1]
+        last_date = x.iloc[-1]['date']
+
+        x['macd'] = x['macd'] / x['close'].mean() * 100
+        macd = x['macd']
+        x['macds'] = macd.ewm(9).mean()
+        x['macdh'] = macd - macd.ewm(9).mean()
+
+        x.drop('date', axis=1, inplace=True)
+        x.drop('open', axis=1, inplace=True)
+        x.drop('high', axis=1, inplace=True)
+        x.drop('low', axis=1, inplace=True)
+        x.drop('close', axis=1, inplace=True)
+        x.drop('volume', axis=1, inplace=True)
+
+        x = x.as_matrix().as_type('float32')
+        y = y.as_matrix()
         if last_date > 20120101:
             x_test.append(x)
             y_test.append(y)
@@ -190,14 +184,16 @@ def load_all():
 
 
 if __name__ == '__main__':
-    fs = os.listdir(source_root)
-    c0 = 0
-    c1 = 1
-    for f in fs:
-        x0, x1 = calculate(source_root + f)
-        c0 += x0
-        c1 += x1
-    print(c0/(c0+c1), c1/(c0+c1))
+    gen_all()
+
+    # fs = os.listdir(source_root)
+    # c0 = 0
+    # c1 = 1
+    # for f in fs:
+    #     x0, x1 = calculate(source_root + f)
+    #     c0 += x0
+    #     c1 += x1
+    # print(c0/(c0+c1), c1/(c0+c1))
 
 
     # x_train, y_train, x_test, y_test = gen_all()
