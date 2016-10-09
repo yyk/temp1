@@ -113,7 +113,7 @@ def print_precision(class_number, preditions, y_test):
         percent = int(len(preditions) * percentage)
         p = preditions.argsort()[-percent:]
         precision = np.count_nonzero(y_test[p]) / len(p)
-        print("Class %d at top %d%% precision %f" % (class_number, percentage * 100, precision))
+        print("Class %d at top %f%% precision %f" % (class_number, percentage * 100, precision))
 
 for epoch in range(nb_epoch):
     # print(get_prediction(inputs=[X_test[:10], 0]))
