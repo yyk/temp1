@@ -1,4 +1,5 @@
 import data2 as data
+from keras import backend as K
 import sys
 from keras.callbacks import ModelCheckpoint
 import keras
@@ -83,11 +84,18 @@ model.compile(
         loss='binary_crossentropy',
          # loss='mse',
         # optimizer='adadelta',
-#          optimizer='rmsprop',
-    optimizer='adam',
+        # optimizer='rmsprop',
+        optimizer='adam',
         metrics=['accuracy'])
 
-# model.load_weights("./checkpoint")
+print(model.summary())
+
+try:
+    weights_to_load = "./checkpoint.backup"
+    model.load_weights(weights_to_load)
+    print("Loaded weights " + weights_to_load)
+except Exception as e:
+    print(e)
 
 # checkpoint = ModelCheckpoint("./checkpoint", monitor='val_acc', verbose=1, save_best_only=True, mode='max')
 tensorboard = keras.callbacks.TensorBoard()
@@ -95,7 +103,14 @@ callbacks_list = [ tensorboard ]
 
 highest_precision = 0
 highest = (0,0,0,0)
+
+get_prediction = K.function([model.layers[0].input],
+                            [model.layers[-2].output])
+
 for epoch in range(nb_epoch):
+    print(get_prediction([X_test[0]][0]))
+
+    print('epoch {}'.format(str(epoch)))
     model.fit(X_train, Y_train,
             batch_size=batch_size,
             nb_epoch=1,
@@ -107,7 +122,7 @@ for epoch in range(nb_epoch):
             #     0: 2,
             #     1: 1.0}
           )
-    print('epoch {}'.format(str(epoch)))
+    model.save(model_file + ".backup", overwrite=True)
     continue
 
     if (epoch+1) % 5 == 0:
@@ -132,7 +147,6 @@ for epoch in range(nb_epoch):
     # for category, (x, y) in tests.items():
     #     score = model.evaluate(x, y, verbose=0, batch_size=batch_size)
     #     print(' [%d] score: %f\taccuracy: %f' % (category, score[0], score[1]))
-    model.save(model_file + ".backup", overwrite=True)
     if precision > highest_precision and recall > 0.01:
         print("Precision increased from {} to {}, saving model to {}".format(highest_precision, precision, model_file))
         highest_precision = precision
