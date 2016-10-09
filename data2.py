@@ -62,7 +62,7 @@ def process(file_path):
     # a['vroc50'] = roc(v, 50)
 
     a = macd(a, 12, 26)
-    a['rsi'] = rsi(a['close'])
+    a['rsi14'] = rsi(a['close'], period=14)
 
     a.drop('open', axis=1, inplace=True)
     a.drop('high', axis=1, inplace=True)
@@ -113,12 +113,14 @@ def rsi(series, period=14):
     gain = diff.apply(lambda x: x if x > 0 else 0) # gain against previous day
     loss = diff.apply(lambda x: -x if x < 0 else 0) # loss against previous day (as positive value)
     first_average_gain = gain.rolling(window=period).mean() # average gain in previous 14 days
-    first_average_loss = loss.mean() # average loss in previous 14 days
+    first_average_loss = loss.rolling(window=period).mean() # average loss in previous 14 days
 
     average_gain = (first_average_gain.shift(1) * (period - 1) + gain) / period
     average_loss = (first_average_loss.shift(1) * (period - 1) + loss) / period
 
-    return 100 - 100 / (1 + average_gain / average_loss)
+    result =  100 - 100 / (1 + average_gain / average_loss)
+    # print(result)
+    return result
 
 def load(file_path):
     a, b = process(file_path)

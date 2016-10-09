@@ -39,6 +39,11 @@ print(Y_train.shape)
 print(X_test.shape)
 print(Y_test.shape)
 
+print("x sample")
+print(X_train[0])
+print("y sample")
+print(Y_train[0])
+
 input_shape = X_train.shape[1:]
 length = X_train.shape[1]
 dimension = X_train.shape[2]
