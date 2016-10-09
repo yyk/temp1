@@ -16,7 +16,8 @@ np.random.seed(1337)  # for reproducibility
 
 model_file = "./checkpoint"
 # batch_size = 512
-batch_size = 1024
+# batch_size = 1024
+batch_size = 8192
 # batch_size = 131072
 nb_epoch = 10000
 init='normal'
@@ -56,7 +57,7 @@ print("input_shape: %s" % (input_shape,))
 
 model = Sequential()
 
-model.add(Convolution1D(nb_filter=32, filter_length=1, activation='relu', border_mode='valid', init=init, input_dim=dimension, input_length=length))
+# model.add(Convolution1D(nb_filter=32, filter_length=1, activation='relu', border_mode='valid', init=init, input_dim=dimension, input_length=length))
 # model.add(Convolution1D(nb_filter=32, filter_length=1, activation='relu', border_mode='valid'))
 # model.add(Convolution1D(nb_filter=32, filter_length=1, activation='relu', border_mode='same', input_shape=input_shape))
 # model.add(Convolution1D(nb_filter=64, filter_length=1, activation='relu', border_mode='same'))
@@ -67,7 +68,7 @@ model.add(Convolution1D(nb_filter=32, filter_length=1, activation='relu', border
 # model.add(LSTM(4))
 # model.add(TimeDistributed(LSTM(512)))
 model.add(GRU(32, dropout_W=0.2, dropout_U=0.2, init=init, consume_less='gpu',
-               # input_dim=dimension, input_length=length,
+               input_dim=dimension, input_length=length,
                return_sequences=True,
                ))
 # model.add(GRU(32, init=init, return_sequences=True))
@@ -113,7 +114,7 @@ highest = (0,0,0,0)
 #                             outputs=[model.layers[-1].output])
 
 def print_precision(class_number, predictions, y_test):
-    percentages = [0.001, 0.01, 0.05, 0.10, 0.5]
+    percentages = [0.001, 0.01, 0.05, 0.10, 0.5, 0.8, 0.99]
     for percentage in percentages:
         percent = int(len(predictions) * percentage)
         p = predictions.argsort()[-percent:]
