@@ -104,11 +104,25 @@ callbacks_list = [ tensorboard ]
 highest_precision = 0
 highest = (0,0,0,0)
 
-get_prediction = K.function(inputs=[model.layers[0].input, K.learning_phase()],
-                            outputs=[model.layers[-1].output])
+# get_prediction = K.function(inputs=[model.layers[0].input, K.learning_phase()],
+#                             outputs=[model.layers[-1].output])
+
+def print_precision(class_number, preditions, y_test):
+    percentages = [0.001, 0.01, 0.05, 0.10, 0.5]
+    for percentage in percentages:
+        percent = int(len(preditions) * percentage)
+        p = preditions.argsort()[-percent:]
+        precision = np.count_nonzero(y_test[p]) / len(p)
+        print("Class %d at top %d%% precision %f" % (class_number, percentage * 100, precision))
 
 for epoch in range(nb_epoch):
-    print(get_prediction(inputs=[X_test[:10], 0]))
+    # print(get_prediction(inputs=[X_test[:10], 0]))
+    model.pop()
+    y_pred = model.predict(X_test, batch_size=batch_size * 3).T
+
+    print_precision(0, y_pred[0], y_test)
+    print_precision(1, y_pred[1], y_test)
+
 
     print('epoch {}'.format(str(epoch)))
     model.fit(X_train, Y_train,
