@@ -112,13 +112,15 @@ highest = (0,0,0,0)
 # get_prediction = K.function(inputs=[model.layers[0].input, K.learning_phase()],
 #                             outputs=[model.layers[-1].output])
 
-def print_precision(class_number, preditions, y_test):
+def print_precision(class_number, predictions, y_test):
     percentages = [0.001, 0.01, 0.05, 0.10, 0.5]
     for percentage in percentages:
-        percent = int(len(preditions) * percentage)
-        p = preditions.argsort()[-percent:]
+        percent = int(len(predictions) * percentage)
+        p = predictions.argsort()[-percent:]
+        selected_predictions = predictions[p]
         precision = np.count_nonzero(y_test[p]) / len(p)
-        print("Class %d at top %1f%% precision %f" % (class_number, percentage * 100, precision))
+        print("Class %d at top %1f%% precision %f, score %f" % (
+        class_number, percentage * 100, precision, selected_predictions[0]))
 
 for epoch in range(nb_epoch):
     # print(get_prediction(inputs=[X_test[:10], 0]))
@@ -147,35 +149,35 @@ for epoch in range(nb_epoch):
     model.save(model_file + ".backup", overwrite=True)
     continue
 
-    if (epoch+1) % 5 == 0:
-        y_pred = model.predict_classes(X_train, batch_size=batch_size)
-        accuracy = accuracy_score(y_train, y_pred)
-        recall = recall_score(y_train, y_pred)
-        precision = precision_score(y_train, y_pred)
-        f1 = f1_score(y_train, y_pred)
-        print('training set\n', 'Accuracy: {}\n'.format(accuracy), 'Recall: {}\n'.format(recall),
-              'Precision: {}\n'.format(precision),
-              'F1: {}'.format(f1))
-
-    y_pred = model.predict_classes(X_test, batch_size=batch_size)
-    accuracy = accuracy_score(y_test, y_pred)
-    recall = recall_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred)
-    f1 = f1_score(y_test, y_pred)
-    print('test set\n', 'Accuracy: {}\n'.format(accuracy), 'Recall: {}\n'.format(recall),
-          'Precision: {}\n'.format(precision),
-          'F1: {}'.format(f1))
-
-    # for category, (x, y) in tests.items():
-    #     score = model.evaluate(x, y, verbose=0, batch_size=batch_size)
-    #     print(' [%d] score: %f\taccuracy: %f' % (category, score[0], score[1]))
-    if precision > highest_precision and recall > 0.01:
-        print("Precision increased from {} to {}, saving model to {}".format(highest_precision, precision, model_file))
-        highest_precision = precision
-        highest = (accuracy, recall, precision, f1)
-        model.save(model_file + ".best", overwrite=True)
-    else:
-        print("Precision didn't increase, current highest accuracy {} recall {} precision {} f1 {}".format(highest[0],
-                                                                                                           highest[1],
-                                                                                                           highest[2],
-                                                                                                           highest[3]))
+    # if (epoch+1) % 5 == 0:
+    #     y_pred = model.predict_classes(X_train, batch_size=batch_size)
+    #     accuracy = accuracy_score(y_train, y_pred)
+    #     recall = recall_score(y_train, y_pred)
+    #     precision = precision_score(y_train, y_pred)
+    #     f1 = f1_score(y_train, y_pred)
+    #     print('training set\n', 'Accuracy: {}\n'.format(accuracy), 'Recall: {}\n'.format(recall),
+    #           'Precision: {}\n'.format(precision),
+    #           'F1: {}'.format(f1))
+    #
+    # y_pred = model.predict_classes(X_test, batch_size=batch_size)
+    # accuracy = accuracy_score(y_test, y_pred)
+    # recall = recall_score(y_test, y_pred)
+    # precision = precision_score(y_test, y_pred)
+    # f1 = f1_score(y_test, y_pred)
+    # print('test set\n', 'Accuracy: {}\n'.format(accuracy), 'Recall: {}\n'.format(recall),
+    #       'Precision: {}\n'.format(precision),
+    #       'F1: {}'.format(f1))
+    #
+    # # for category, (x, y) in tests.items():
+    # #     score = model.evaluate(x, y, verbose=0, batch_size=batch_size)
+    # #     print(' [%d] score: %f\taccuracy: %f' % (category, score[0], score[1]))
+    # if precision > highest_precision and recall > 0.01:
+    #     print("Precision increased from {} to {}, saving model to {}".format(highest_precision, precision, model_file))
+    #     highest_precision = precision
+    #     highest = (accuracy, recall, precision, f1)
+    #     model.save(model_file + ".best", overwrite=True)
+    # else:
+    #     print("Precision didn't increase, current highest accuracy {} recall {} precision {} f1 {}".format(highest[0],
+    #                                                                                                        highest[1],
+    #                                                                                                        highest[2],
+    #                                                                                                        highest[3]))
