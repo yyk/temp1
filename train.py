@@ -5,7 +5,7 @@ from keras.callbacks import ModelCheckpoint
 import keras
 from keras.layers.wrappers import TimeDistributed
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation, Flatten
+from keras.layers import Dense, Dropout, Activation, Flatten, Input
 from keras.layers import Convolution2D, MaxPooling2D, Convolution1D, LSTM, GRU
 from keras.utils import np_utils
 import numpy as np
@@ -104,11 +104,11 @@ callbacks_list = [ tensorboard ]
 highest_precision = 0
 highest = (0,0,0,0)
 
-get_prediction = K.function([model.layers[0].input],
-                            [model.layers[-2].output])
+get_prediction = K.function(inputs=[model.layers[0].input, K.learning_phase()],
+                            outputs=[model.layers[-1].output])
 
 for epoch in range(nb_epoch):
-    print(get_prediction([X_test[0]][0]))
+    print(get_prediction(inputs=[X_test[:10], 0]))
 
     print('epoch {}'.format(str(epoch)))
     model.fit(X_train, Y_train,
