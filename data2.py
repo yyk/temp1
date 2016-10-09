@@ -1,4 +1,6 @@
 import pandas as pd
+from multiprocessing.pool import ThreadPool
+import threading
 import numpy as np
 import os
 import sys
@@ -11,7 +13,7 @@ x_train_file = output_root + "x_train"
 y_train_file = output_root + "y_train"
 x_test_file = output_root + "x_test"
 y_test_file = output_root + "y_test"
-
+window_size = 100
 
 def calculate(file_path):
     a = pd.read_csv(file_path, names=['date', 'unknown', 'open', 'high', 'low', 'close', 'volume'],
@@ -33,6 +35,7 @@ def process(file_path):
     a['volume'] /= 1000000
     v = a['volume']
 
+    # a['sma%d' % window_size] = c.rolling(window=window_size).mean()
     # a['sma5'] = c.rolling(window=5).mean()
     # a['sma20'] = c.rolling(window=20).mean()
     # a['sma50'] = c.rolling(window=50).mean()
@@ -88,8 +91,10 @@ def macd(a, fast, slow):
     ema_fast = prices.ewm(fast).mean()
     ema_slow = prices.ewm(slow).mean()
     # normalize them
-    macd = ema_fast - ema_slow
+    macd = (ema_fast - ema_slow) / prices.ewm(slow * 3).mean()
     a['macd'] = macd
+    a['macds'] = macd.ewm(9).mean()
+    a['macdh'] = macd - macd.ewm(9).mean()
     return a
 
 def rsi(series, period=14):
@@ -111,32 +116,28 @@ def rsi(series, period=14):
 
 def load(file_path):
     a, b = process(file_path)
+    print("Loading " + file_path)
     x_train = []
     x_test = []
     y_train = []
     y_test = []
-    window_size = 50
+
+    for column in ['open', 'high', 'low', 'close', 'volume']:
+        a.drop(column, axis=1, inplace=True)
     for i in range(0, len(a) - window_size):
         # print(a[0])
         # sys.exit(0)
-        x = a.iloc[i: i + window_size].copy()
+        x = a.iloc[i: i + window_size]
         y = b.iloc[i + window_size - 1]
         last_date = x.iloc[-1]['date']
 
-        x['macd'] = x['macd'] / x['close'].mean() * 100
-        macd = x['macd']
-        x['macds'] = macd.ewm(9).mean()
-        x['macdh'] = macd - macd.ewm(9).mean()
+        # x['macd'] = x['macd'] / x['sma%d' % window_size].iloc[-1] * 100
+        # macd = x['macd']
+        # x['macds'] = macd.ewm(9).mean()
+        # x['macdh'] = macd - macd.ewm(9).mean()
 
-        x.drop('date', axis=1, inplace=True)
-        x.drop('open', axis=1, inplace=True)
-        x.drop('high', axis=1, inplace=True)
-        x.drop('low', axis=1, inplace=True)
-        x.drop('close', axis=1, inplace=True)
-        x.drop('volume', axis=1, inplace=True)
 
-        x = x.as_matrix().as_type('float32')
-        y = y.as_matrix()
+        x = x.as_matrix().astype('float32')
         if last_date > 20120101:
             x_test.append(x)
             y_test.append(y)
@@ -149,14 +150,18 @@ def load(file_path):
 def gen_all():
     fs = os.listdir(source_root)
     #   fs = fs[:5]
+    async_results = []
+    pool = ThreadPool(processes=1)
+    for f in fs:
+        async_results.append(pool.apply_async(load, (source_root + f,)))
 
     x_trains = []
     y_trains = []
     x_tests = []
     y_tests = []
     #   i = 0
-    for f in fs:
-        x_train, y_train, x_test, y_test = load(source_root + f)
+    for async_result in async_results:
+        x_train, y_train, x_test, y_test = async_result.get()
         #     i += 1
         #     print("%d Loaded %s" % (i, f))
         x_trains.extend(x_train)
@@ -171,7 +176,6 @@ def gen_all():
 
 
 def load_all():
-    return gen_all()
     print("Loading " + x_train_file + ".npy")
     x_train = np.load(x_train_file + ".npy")
     print("Loading " + y_train_file + ".npy")
@@ -184,8 +188,6 @@ def load_all():
 
 
 if __name__ == '__main__':
-    gen_all()
-
     # fs = os.listdir(source_root)
     # c0 = 0
     # c1 = 1
@@ -196,7 +198,7 @@ if __name__ == '__main__':
     # print(c0/(c0+c1), c1/(c0+c1))
 
 
-    # x_train, y_train, x_test, y_test = gen_all()
+    x_train, y_train, x_test, y_test = gen_all()
     #   print(x_test.dtype)
 
     # print("Shuffling")
@@ -207,13 +209,13 @@ if __name__ == '__main__':
     # x_test = x_test[s]
     # y_test = y_test[s]
 
-    # print("Start writing")
+    print("Start writing")
     # print(x_train.shape)
     #
-    # np.save(x_train_file, x_train)
-    # print(y_train.shape)
-    # np.save(y_train_file, y_train)
-    # print(x_test.shape)
-    # np.save(x_test_file, x_test)
-    # print(y_test.shape)
-    # np.save(y_test_file, y_test)
+    np.save(x_train_file, x_train)
+    print(y_train.shape)
+    np.save(y_train_file, y_train)
+    print(x_test.shape)
+    np.save(x_test_file, x_test)
+    print(y_test.shape)
+    np.save(y_test_file, y_test)
