@@ -7,7 +7,7 @@ import sys
 
 np.set_printoptions(precision=4, suppress=True)
 
-version = 5
+version = 8
 source_root = "./quantquote_daily_sp500/daily/"
 output_root = "./quantquote_daily_sp500/generated/%d/" % version
 x_train_file = output_root + "x_train"
@@ -33,8 +33,13 @@ def process(file_path):
     a = pd.read_csv(file_path, names=['date', 'unknown', 'open', 'high', 'low', 'close', 'volume'],
                     usecols=[0, 2, 3, 4, 5, 6], header=None)
     c = a['close']
-    a['volume'] /= 1000000
+    a['volume']
     v = a['volume']
+
+    # a['close_ln'] = np.log(a['close'])
+    # a['roc1_ln'] = a['close_ln'] / a['close_ln'].shift(1)
+    # a['volume_ln'] = np.log(a['volume']/10000)
+    # a['vroc1_ln'] = a['volume_ln'] / a['volume_ln'].shift(1)
 
     a['sma%d' % window_size] = c.rolling(window=window_size).mean()
     # a['sma5'] = c.rolling(window=5).mean()
@@ -65,8 +70,8 @@ def process(file_path):
     # a['vroc50'] = roc(v, 50)
 
     a = macd(a, 12, 26)
-    a['rsi14'] = rsi(a['close'], period=14)
-    a['mfi14'] = mfi(a, period=4)
+    a['rsi14'] = rsi(a['close'], period=14) / 100
+    a['mfi14'] = mfi(a, period=4) / 100
 
     # b = c.ewm(span=12).mean() - c.ewm(span=26).mean()
     # b = c.ewm(span=26).mean()
@@ -122,11 +127,12 @@ def mfi(a, period = 14):
     """
     typical = (a['close'] + a['low'] + a['high']) / 3
     raw_money_flow = typical * a['volume']
-    diff = a['close'].diff(period)
+    diff = typical.diff(1)
     positive = diff.apply(lambda x: 1 if x > 0 else 0)
     negative = diff.apply(lambda x: 1 if x < 0 else 0)
-    positive_money_flow = raw_money_flow * positive
-    negative_money_flow = raw_money_flow * negative
+    positive_money_flow = (raw_money_flow * positive).rolling(window=period).sum()
+    negative_money_flow = (raw_money_flow * negative).rolling(window=period).sum()
+
     money_flow_ratio = positive_money_flow / negative_money_flow
     result = 100 - 100 / (1 + money_flow_ratio)
     return result
@@ -142,22 +148,29 @@ def load(file_path):
 
     for column in ['open', 'high', 'low', 'volume']:
         a.drop(column, axis=1, inplace=True)
+    a = a.as_matrix(columns=[
+            'date',
+            # 'sma%d' % window_size,
+            # 'macd', 'macds', 'macdh',
+            'rsi14', 'mfi14',
+            # 'close_ln', 'roc1_ln',
+            # 'volume_ln', 'vroc1_ln'
+        ]).astype('float32')
     for i in range(0, len(a) - window_size):
         # print(a[0])
         # sys.exit(0)
-        x = a.iloc[i: i + window_size].copy()
+        x = a[i: i + window_size, 1:]
         y = b.iloc[i + window_size - 1]
-        last_date = x.iloc[-1]['date']
+        last_date = a[i+window_size-1][0]
 
-        x['macd'] = x['macd'] / x['sma%d' % window_size].iloc[-1] * 100
-        macd = x['macd']
-        x['macds'] = macd.ewm(9).mean()
-        x['macdh'] = macd - x['macds']
+        # x['macd'] = x['macd'] / x['sma%d' % window_size].iloc[-1] * 100
+        # macd = x['macd']
+        # x['macds'] = macd.ewm(9).mean()
+        # x['macdh'] = macd - x['macds']
 
         # for column in ['date', 'close', 'sma%d' % window_size]:
         #     x.drop(column, axis=1, inplace=True)
 
-        x = x.as_matrix(columns=['macd', 'macds', 'macdh', 'rsi14', 'mfi14']).astype('float32')
         if last_date > 20120101:
             x_test.append(x)
             y_test.append(y)
@@ -176,6 +189,8 @@ def gen_all(test=False):
     pool = Pool(processes=12)
     for f in fs:
         async_results.append(pool.apply_async(load, (source_root + f,)))
+        if test:
+            break
 
     x_trains = []
     y_trains = []

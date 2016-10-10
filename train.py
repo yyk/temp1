@@ -67,16 +67,16 @@ model = Sequential()
 
 # model.add(LSTM(4))
 # model.add(TimeDistributed(LSTM(512)))
-model.add(GRU(32, dropout_W=0.2, dropout_U=0.2, init=init, consume_less='gpu',
+model.add(GRU(8, dropout_W=0.2, dropout_U=0.2, init=init, consume_less='gpu', activation='relu',
                input_dim=dimension, input_length=length,
-               return_sequences=True,
+               # return_sequences=True,
                ))
 # model.add(GRU(32, init=init, return_sequences=True))
-model.add(GRU(32, init=init))
+# model.add(LSTM(32, init=init, activation='relu'))
 # model.add(GRU(2048))
 
 # model.add(Flatten())
-model.add(Dense(256, init=init))
+model.add(Dense(32, init=init))
 # model.add(Activation('relu'))
 # model.add(Dropout(0.2))
 # model.add(Dense(1))
@@ -89,17 +89,17 @@ model.add(Activation('softmax'))
 model.compile(
         loss='binary_crossentropy',
          # loss='mse',
-        # optimizer='adadelta',
+        optimizer='adadelta',
         # optimizer='rmsprop',
-        optimizer='adam',
+        # optimizer='adam',
         metrics=['accuracy'])
 
 print(model.summary())
 
 try:
     weights_to_load = "./checkpoint.backup"
-    model.load_weights(weights_to_load)
-    print("Loaded weights " + weights_to_load)
+    # model.load_weights(weights_to_load)
+    # print("Loaded weights " + weights_to_load)
 except Exception as e:
     print(e)
 
