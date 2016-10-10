@@ -152,7 +152,7 @@ def load(file_path):
             'date',
             # 'sma%d' % window_size,
             # 'macd', 'macds', 'macdh',
-            'rsi14', 'mfi14',
+            'mfi14', #'rsi14',
             # 'close_ln', 'roc1_ln',
             # 'volume_ln', 'vroc1_ln'
         ]).astype('float32')
@@ -213,8 +213,8 @@ def gen_all(test=False):
 
 
 def load_all():
-    if not os.path.exists(x_train_file + ".npy"):
-        produce_all()
+    # if not os.path.exists(x_train_file + ".npy"):
+    produce_all()
     print("Loading " + x_train_file + ".npy")
     x_train = np.load(x_train_file + ".npy")
     print("Loading " + y_train_file + ".npy")

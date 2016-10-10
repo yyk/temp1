@@ -67,7 +67,7 @@ model = Sequential()
 
 # model.add(LSTM(4))
 # model.add(TimeDistributed(LSTM(512)))
-model.add(GRU(8, dropout_W=0.2, dropout_U=0.2, init=init, consume_less='gpu', activation='relu',
+model.add(GRU(32, dropout_W=0.2, dropout_U=0.2, init=init, consume_less='gpu', activation='relu',
                input_dim=dimension, input_length=length,
                # return_sequences=True,
                ))
@@ -76,7 +76,7 @@ model.add(GRU(8, dropout_W=0.2, dropout_U=0.2, init=init, consume_less='gpu', ac
 # model.add(GRU(2048))
 
 # model.add(Flatten())
-model.add(Dense(32, init=init))
+model.add(Dense(4098, init=init))
 # model.add(Activation('relu'))
 # model.add(Dropout(0.2))
 # model.add(Dense(1))
