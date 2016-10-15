@@ -15,10 +15,7 @@ from sklearn.metrics import (precision_score, recall_score,
 np.random.seed(1337)  # for reproducibility
 
 model_file = "./checkpoint"
-# batch_size = 512
-# batch_size = 1024
-batch_size = 8192
-# batch_size = 131072
+batch_size = 512
 nb_epoch = 10000
 init='normal'
 
@@ -41,9 +38,9 @@ print(X_test.shape)
 print(Y_test.shape)
 
 print("x sample")
-print(X_train[0])
+print(X_train[0:3])
 print("y sample")
-print(Y_train[0])
+print(Y_train[0:3])
 
 input_shape = X_train.shape[1:]
 length = X_train.shape[1]
@@ -67,16 +64,17 @@ model = Sequential()
 
 # model.add(LSTM(4))
 # model.add(TimeDistributed(LSTM(512)))
-model.add(GRU(32, dropout_W=0.2, dropout_U=0.2, init=init, consume_less='gpu', activation='relu',
-               input_dim=dimension, input_length=length,
+model.add(LSTM(128,init=init, consume_less='gpu', activation='relu',
+               input_dim=dimension#, input_length=length,
                # return_sequences=True,
+               # dropout_W=0.1, dropout_U=0.1,
                ))
 # model.add(GRU(32, init=init, return_sequences=True))
 # model.add(LSTM(32, init=init, activation='relu'))
 # model.add(GRU(2048))
 
 # model.add(Flatten())
-model.add(Dense(4098, init=init))
+model.add(Dense(1024, init=init))
 # model.add(Activation('relu'))
 # model.add(Dropout(0.2))
 # model.add(Dense(1))
@@ -126,7 +124,7 @@ def print_precision(class_number, predictions, y_test):
 for epoch in range(nb_epoch):
     # print(get_prediction(inputs=[X_test[:10], 0]))
     model.pop()
-    y_pred = model.predict(X_test, batch_size=batch_size * 3).T
+    y_pred = model.predict(X_test, batch_size=batch_size).T
     print(y_pred[0][:20])
     print(y_pred[1][:20])
 
@@ -140,7 +138,7 @@ for epoch in range(nb_epoch):
             batch_size=batch_size,
             nb_epoch=1,
             verbose=1,
-            shuffle=True,
+            shuffle=False,
             validation_data=(X_test, Y_test),
             callbacks=callbacks_list
             # class_weight = {

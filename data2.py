@@ -7,14 +7,14 @@ import sys
 
 np.set_printoptions(precision=4, suppress=True)
 
-version = 8
+version = 9
 source_root = "./quantquote_daily_sp500/daily/"
 output_root = "./quantquote_daily_sp500/generated/%d/" % version
 x_train_file = output_root + "x_train"
 y_train_file = output_root + "y_train"
 x_test_file = output_root + "x_test"
 y_test_file = output_root + "y_test"
-window_size = 50
+window_size = 1
 
 def calculate(file_path):
     a = pd.read_csv(file_path, names=['date', 'unknown', 'open', 'high', 'low', 'close', 'volume'],
@@ -36,14 +36,14 @@ def process(file_path):
     a['volume']
     v = a['volume']
 
-    # a['close_ln'] = np.log(a['close'])
-    # a['roc1_ln'] = a['close_ln'] / a['close_ln'].shift(1)
+    a['close_ln'] = np.log(a['close'])
+    # a['roc1_ln'] = np.log(a['close']/a['close'].shift(1))
     # a['volume_ln'] = np.log(a['volume']/10000)
     # a['vroc1_ln'] = a['volume_ln'] / a['volume_ln'].shift(1)
 
-    a['sma%d' % window_size] = c.rolling(window=window_size).mean()
-    # a['sma5'] = c.rolling(window=5).mean()
-    # a['sma20'] = c.rolling(window=20).mean()
+    # a['sma%d' % window_size] = c.rolling(window=window_size).mean()
+    a['sma5'] = np.log(c.rolling(window=5).mean())
+    a['sma20'] = np.log(c.rolling(window=20).mean())
     # a['sma50'] = c.rolling(window=50).mean()
     # a['sma150'] = c.rolling(window=150).mean()
 
@@ -71,7 +71,7 @@ def process(file_path):
 
     a = macd(a, 12, 26)
     a['rsi14'] = rsi(a['close'], period=14) / 100
-    a['mfi14'] = mfi(a, period=4) / 100
+    # a['mfi14'] = mfi(a, period=4) / 100
 
     # b = c.ewm(span=12).mean() - c.ewm(span=26).mean()
     # b = c.ewm(span=26).mean()
@@ -141,27 +141,37 @@ def load(file_path):
     global global_number_of_file_loaded
     a, b = process(file_path)
     print("Loading %s" % (file_path, ))
-    x_train = []
-    x_test = []
-    y_train = []
-    y_test = []
-
-    for column in ['open', 'high', 'low', 'volume']:
-        a.drop(column, axis=1, inplace=True)
-    a = a.as_matrix(columns=[
+    columns = [
             'date',
             # 'sma%d' % window_size,
             # 'macd', 'macds', 'macdh',
-            'mfi14', #'rsi14',
-            # 'close_ln', 'roc1_ln',
+            'rsi14',
+        # 'mfi14',
+            # 'close_ln',
+            # 'sma5', 'sma20',
+            # 'roc1_ln',
+            # 'roc1',
             # 'volume_ln', 'vroc1_ln'
-        ]).astype('float32')
+        ]
+    x_train = [[[0 for i in range(len(columns) - 1)],], ]
+    y_train = [0, ]
+
+    x_test = [[[0 for i in range(len(columns) - 1)],], ]
+    y_test = [0, ]
+
+    for column in ['open', 'high', 'low', 'volume']:
+        a.drop(column, axis=1, inplace=True)
+    a = a.as_matrix(columns=columns).astype('float32')
     for i in range(0, len(a) - window_size):
         # print(a[0])
         # sys.exit(0)
         x = a[i: i + window_size, 1:]
         y = b.iloc[i + window_size - 1]
         last_date = a[i+window_size-1][0]
+
+        # print(x)
+        # print(y)
+        # sys.exit(1)
 
         # x['macd'] = x['macd'] / x['sma%d' % window_size].iloc[-1] * 100
         # macd = x['macd']
