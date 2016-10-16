@@ -26,12 +26,12 @@ X_train, y_train, X_test, y_test, train_sample_weight = data.load_all()
 nb_classes = 2
 
 weight_scaler = RobustScaler(quantile_range=(5.0, 95.0))
-weight_scaler.fit_transform(train_sample_weight.reshape(-1, 1))
-train_sample_weight.apply(np.absolute(train_sample_weight))
+train_sample_weight = weight_scaler.fit_transform(train_sample_weight.reshape(-1, 1))
+train_sample_weight = (np.absolute(train_sample_weight[:2000])) + 0.5
 
-plt.plot(train_sample_weight)
-plt.show()
-sys.exit(1)
+# plt.plot(train_sample_weight)
+# plt.show()
+# sys.exit(1)
 
 # Y_train = y_train
 # Y_test = y_test

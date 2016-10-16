@@ -8,7 +8,7 @@ import sys
 
 np.set_printoptions(precision=4, suppress=True)
 
-version = 1
+version = 2
 source_root = "./quantquote_daily_sp500/preprocessed/"
 output_root = "./quantquote_daily_sp500/generated/%d/" % version
 x_train_file = output_root + "x_train"
@@ -34,16 +34,8 @@ def process(file_path):
     # return a.as_matrix().astype('float32')[days_to_disgard:], b.as_matrix()[days_to_disgard:]
     return a[days_to_disgard:], b[days_to_disgard:], w[days_to_disgard:]
 
-def load(file_path):
-    a, b, w = process(file_path)
-    columns = ['date',
-            'macd', 'macds', 'macdh',
-               'close_roc1_ln_scaled',
-               'close_roc5_ln_scaled',
-               'close_roc20_ln_scaled',
-               'rsi14', 'mfi14',
-               'close_sma5_ln_scaled', 'close_sma20_ln_scaled',
-               ]
+def load(file_path, columns):
+    a, b, c = process(file_path)
 
     x_train = []
     y_train = []
@@ -58,7 +50,7 @@ def load(file_path):
         # sys.exit(0)
         x = a[i: i + window_size, 1:]
         y = b.iloc[i + window_size - 1]
-        w = b.iloc[i + window_size - 1]
+        sample_weight = c.iloc[i + window_size - 1]
         last_date = a[i+window_size-1][0]
 
         # print(x)
@@ -79,7 +71,7 @@ def load(file_path):
         else:
             x_train.append(x)
             y_train.append(y)
-            train_sample_weight.append(w)
+            train_sample_weight.append(sample_weight)
     return x_train, y_train, x_test, y_test, train_sample_weight
 
 def gen_all(test=False):
@@ -92,12 +84,25 @@ def gen_all(test=False):
     async_results = {}
     processes=12
     pool = Pool(processes)
+    columns = ['date',
+        # 'macd', 'macds', 'macdh',
+           'ppo_12_26', 'ppos_12_26', 'ppoh_12_26',
+           'close_roc1_ln_scaled',
+           'close_roc5_ln_scaled',
+           'close_roc20_ln_scaled',
+           'rsi14', 'mfi14',
+           'close_ln_scaled',
+           'close_sma5_ln_scaled', 'close_sma20_ln_scaled',
+           ]
+    columns.extend(['month_%d' % x for x in range(1, 13)])
+
     print("Loading files with %d processes..." % processes)
+    print("Columns being used ", columns)
     for f in fs:
         if not f.endswith(".csv"):
             print("Skipping ", f)
             continue
-        async_results[f] = (pool.apply_async(load, (source_root + f,)))
+        async_results[f] = (pool.apply_async(load, (source_root + f, columns)))
         if test:
             break
 
@@ -131,7 +136,7 @@ def gen_all(test=False):
 
 def load_all():
     # if not os.path.exists(x_train_file + ".npy"):
-    # produce_all()
+    produce_all()
     print("Loading " + x_train_file + ".npy")
     x_train = np.load(x_train_file + ".npy")
     print("Loading " + y_train_file + ".npy")

@@ -54,6 +54,14 @@ def preprocess_all():
         r.get()
 
 
+def months(a):
+    m = a['date'].apply(lambda x: int(x / 100) % 100)
+    for i in range(1, 13):
+        newcolumn = np.zeros(len(a))
+        newcolumn[np.where(m == i)] = 1
+        a['month_%d' % i] = newcolumn
+
+
 def preprocess(file_name):
     print("preprocess ", file_name)
     a = pd.read_csv(source_root + file_name, names=['date', 'unknown', 'open', 'high', 'low', 'close', 'volume'],
@@ -66,6 +74,8 @@ def preprocess(file_name):
     a['rsi14'] = rsi(a['close'], period=14) / 100
     a['mfi14'] = mfi(a, period=4) / 100
     macd(a, 12, 26)
+    ppo(a, 12, 26)
+    months(a)
 
     # a['sma%d' % window_size] = c.rolling(window=window_size).mean()
     # a['close_ln_scaled_sma5'] = np.log(c.rolling(window=5).mean())
@@ -133,18 +143,38 @@ def macd(a, fast, slow):
     ema_slow = prices.ewm(slow).mean()
     # normalize them
     macd = ema_fast - ema_slow
+    macds = macd.ewm(9).mean()
+    macdh = macd - macd.ewm(9).mean()
 
     scaler = RobustScaler(quantile_range=(5.0, 95.0))
     scaler.fit(macd.values.reshape(-1, 1))
-    a['macd'] = macd
-    a['macds'] = macd.ewm(9).mean()
-    a['macdh'] = macd - macd.ewm(9).mean()
+    suffix = "_%d_%d" % (fast, slow)
 
-    a['macd'] = scaler.transform(a['macd'].values.reshape(-1, 1))
-    a['macds'] = scaler.transform(a['macds'].values.reshape(-1, 1))
+    a['macd' + suffix] = scaler.transform(macd.values.reshape(-1, 1))
+    a['macds' + suffix] = scaler.transform(macds.values.reshape(-1, 1))
 
     scaler = RobustScaler(quantile_range=(5.0, 95.0))
-    a['macdh'] = scaler.fit_transform(a['macdh'].values.reshape(-1, 1))
+    a['macdh' + suffix] = scaler.fit_transform(macdh.values.reshape(-1, 1))
+
+def ppo(a, fast, slow):
+    prices = a['close']
+
+    ema_fast = prices.ewm(fast).mean()
+    ema_slow = prices.ewm(slow).mean()
+    ppo = (ema_fast - ema_slow) * 100
+    ppos = ppo.ewm(9).mean()
+    ppoh = ppo - ppos
+
+    scaler = RobustScaler(quantile_range=(5.0, 95.0))
+    scaler.fit(ppo.values.reshape(-1, 1))
+    suffix = "_%d_%d" % (fast, slow)
+
+    a['ppo' + suffix] = scaler.transform(ppo.values.reshape(-1, 1))
+    a['ppos' + suffix] = scaler.transform(ppos.values.reshape(-1, 1))
+
+    scaler = RobustScaler(quantile_range=(5.0, 95.0))
+    a['ppoh' + suffix] = scaler.fit_transform(ppoh.values.reshape(-1, 1))
+
 
 def rsi(series, period=14):
     """
