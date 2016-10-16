@@ -64,13 +64,15 @@ model = Sequential()
 
 # model.add(LSTM(4))
 # model.add(TimeDistributed(LSTM(512)))
-model.add(LSTM(128,init=init, consume_less='gpu', activation='relu',
-               input_dim=dimension#, input_length=length,
+model.add(LSTM(512, init=init, consume_less='gpu', activation='relu',
+               input_dim=dimension, input_length=length,
                # return_sequences=True,
-               # dropout_W=0.1, dropout_U=0.1,
+               dropout_W=0.1, dropout_U=0.1,
                ))
 # model.add(GRU(32, init=init, return_sequences=True))
-# model.add(LSTM(32, init=init, activation='relu'))
+# model.add(LSTM(512, init=init,
+#                activation='relu'
+#                ))
 # model.add(GRU(2048))
 
 # model.add(Flatten())
@@ -87,7 +89,7 @@ model.add(Activation('softmax'))
 model.compile(
         loss='binary_crossentropy',
          # loss='mse',
-        optimizer='adadelta',
+        optimizer='adam',
         # optimizer='rmsprop',
         # optimizer='adam',
         metrics=['accuracy'])
@@ -102,8 +104,8 @@ except Exception as e:
     print(e)
 
 # checkpoint = ModelCheckpoint("./checkpoint", monitor='val_acc', verbose=1, save_best_only=True, mode='max')
-tensorboard = keras.callbacks.TensorBoard()
-callbacks_list = [ tensorboard ]
+# tensorboard = keras.callbacks.TensorBoard()
+# callbacks_list = [ tensorboard ]
 
 highest_precision = 0
 highest = (0,0,0,0)
@@ -123,24 +125,24 @@ def print_precision(class_number, predictions, y_test):
 
 for epoch in range(nb_epoch):
     # print(get_prediction(inputs=[X_test[:10], 0]))
-    model.pop()
-    y_pred = model.predict(X_test, batch_size=batch_size).T
-    print(y_pred[0][:20])
-    print(y_pred[1][:20])
-
-    print_precision(0, y_pred[0], y_test)
-    print('-----------------------------')
-    print_precision(1, y_pred[1], y_test)
+    # model.pop()
+    # y_pred = model.predict(X_test, batch_size=batch_size).T
+    # print(y_pred[0][:20])
+    # print(y_pred[1][:20])
+    #
+    # print_precision(0, y_pred[0], y_test)
+    # print('-----------------------------')
+    # print_precision(1, y_pred[1], y_test)
+    # model.add(Activation('softmax'))
 
     print('epoch {}'.format(str(epoch)))
-    model.add(Activation('softmax'))
     model.fit(X_train, Y_train,
             batch_size=batch_size,
             nb_epoch=1,
             verbose=1,
             shuffle=False,
             validation_data=(X_test, Y_test),
-            callbacks=callbacks_list
+            # callbacks=callbacks_list
             # class_weight = {
             #     0: 2,
             #     1: 1.0}

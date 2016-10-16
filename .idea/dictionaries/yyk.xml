@@ -2,6 +2,8 @@
   <dictionary name="yyk">
     <words>
       <w>macd</w>
+      <w>preprocess</w>
+      <w>scaler</w>
     </words>
   </dictionary>
 </component>
