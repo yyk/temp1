@@ -1,4 +1,5 @@
 import pandas as pd
+from sklearn.preprocessing import MinMaxScaler, RobustScaler
 from multiprocessing.pool import Pool
 import threading
 import numpy as np
@@ -7,19 +8,22 @@ import sys
 
 np.set_printoptions(precision=4, suppress=True)
 
-version = 9
+version = 1
 source_root = "./quantquote_daily_sp500/preprocessed/"
 output_root = "./quantquote_daily_sp500/generated/%d/" % version
 x_train_file = output_root + "x_train"
 y_train_file = output_root + "y_train"
 x_test_file = output_root + "x_test"
 y_test_file = output_root + "y_test"
+train_sample_weight_file = output_root + "train_sample_weight"
 window_size = 100
 
 def process(file_path):
     a = pd.read_csv(file_path, header=0)
 
     b = a['close_roc10_ln'].shift(-10).apply(lambda x: 0 if x <= 0 else 1)
+
+    w = a['close_roc10_ln'].shift(-10)
     # b = rsi(a['close'], period=14)
     # a['diff5'] = b
     # print(a.loc[:, ['close', 'roc5', 'diff5']])
@@ -28,23 +32,24 @@ def process(file_path):
     # discard the first 200 days.
     days_to_disgard = 200
     # return a.as_matrix().astype('float32')[days_to_disgard:], b.as_matrix()[days_to_disgard:]
-    return a[days_to_disgard:], b[days_to_disgard:]
+    return a[days_to_disgard:], b[days_to_disgard:], w[days_to_disgard:]
 
 def load(file_path):
-    a, b = process(file_path)
-    print("Loading %s" % (file_path, ))
+    a, b, w = process(file_path)
     columns = ['date',
             'macd', 'macds', 'macdh',
-               # 'close_roc1_ln_scaled',
-               # 'close_roc5_ln_scaled',
-               # 'close_roc10_ln_scaled',
-               'rsi14',
+               'close_roc1_ln_scaled',
+               'close_roc5_ln_scaled',
+               'close_roc20_ln_scaled',
+               'rsi14', 'mfi14',
+               'close_sma5_ln_scaled', 'close_sma20_ln_scaled',
                ]
 
     x_train = []
     y_train = []
     x_test = []
     y_test = []
+    train_sample_weight = []
 
     a = a[columns]
     a = a.as_matrix(columns=columns).astype('float32')
@@ -53,6 +58,7 @@ def load(file_path):
         # sys.exit(0)
         x = a[i: i + window_size, 1:]
         y = b.iloc[i + window_size - 1]
+        w = b.iloc[i + window_size - 1]
         last_date = a[i+window_size-1][0]
 
         # print(x)
@@ -73,7 +79,8 @@ def load(file_path):
         else:
             x_train.append(x)
             y_train.append(y)
-    return x_train, y_train, x_test, y_test
+            train_sample_weight.append(w)
+    return x_train, y_train, x_test, y_test, train_sample_weight
 
 def gen_all(test=False):
     fs = os.listdir(source_root)
@@ -83,7 +90,9 @@ def gen_all(test=False):
     # fs = fs[:1]
     # fs = ["table_agn.csv", ]
     async_results = {}
-    pool = Pool(processes=12)
+    processes=12
+    pool = Pool(processes)
+    print("Loading files with %d processes..." % processes)
     for f in fs:
         if not f.endswith(".csv"):
             print("Skipping ", f)
@@ -96,10 +105,11 @@ def gen_all(test=False):
     y_trains = []
     x_tests = []
     y_tests = []
+    train_sample_weights = []
     #   i = 0
     for key, result in async_results.items():
         try:
-            x_train, y_train, x_test, y_test = result.get()
+            x_train, y_train, x_test, y_test, train_sample_weight = result.get()
         except Exception as e:
             print(key)
             raise e
@@ -110,16 +120,18 @@ def gen_all(test=False):
         y_trains.extend(y_train)
         x_tests.extend(x_test)
         y_tests.extend(y_test)
+        train_sample_weights.extend(train_sample_weight)
     print("Creating np arrays")
     return np.array(x_trains), \
            np.array(y_trains), \
            np.array(x_tests), \
-           np.array(y_tests)
+           np.array(y_tests), \
+           np.array(train_sample_weights)
 
 
 def load_all():
-    if not os.path.exists(x_train_file + ".npy"):
-        produce_all()
+    # if not os.path.exists(x_train_file + ".npy"):
+    # produce_all()
     print("Loading " + x_train_file + ".npy")
     x_train = np.load(x_train_file + ".npy")
     print("Loading " + y_train_file + ".npy")
@@ -128,11 +140,13 @@ def load_all():
     x_test = np.load(x_test_file + ".npy")
     print("Loading " + y_test_file + ".npy")
     y_test = np.load(y_test_file + ".npy")
-    return x_train, y_train, x_test, y_test
+    print("Loading " + train_sample_weight_file + ".npy")
+    train_sample_weight = np.load(train_sample_weight_file + ".npy")
+    return x_train, y_train, x_test, y_test, train_sample_weight
 
 
 def produce_all(test=False):
-    x_train, y_train, x_test, y_test = gen_all(test)
+    x_train, y_train, x_test, y_test, train_sample_weight = gen_all(test)
     print("Start writing")
     if not os.path.exists(output_root):
         os.mkdir(output_root)
@@ -144,6 +158,8 @@ def produce_all(test=False):
     np.save(x_test_file, x_test)
     print(y_test.shape)
     np.save(y_test_file, y_test)
+    print(train_sample_weight.shape)
+    np.save(train_sample_weight_file, train_sample_weight)
 
 
 if __name__ == '__main__':

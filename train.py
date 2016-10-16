@@ -1,3 +1,6 @@
+from sklearn.preprocessing import RobustScaler
+import matplotlib.pyplot as plt
+
 import data2 as data
 from keras import backend as K
 import sys
@@ -15,12 +18,20 @@ from sklearn.metrics import (precision_score, recall_score,
 np.random.seed(1337)  # for reproducibility
 
 model_file = "./checkpoint"
-batch_size = 512
+batch_size = 4096
 nb_epoch = 10000
 init='normal'
 
-X_train, y_train, X_test, y_test = data.load_all()
+X_train, y_train, X_test, y_test, train_sample_weight = data.load_all()
 nb_classes = 2
+
+weight_scaler = RobustScaler(quantile_range=(5.0, 95.0))
+weight_scaler.fit_transform(train_sample_weight.reshape(-1, 1))
+train_sample_weight.apply(np.absolute(train_sample_weight))
+
+plt.plot(train_sample_weight)
+plt.show()
+sys.exit(1)
 
 # Y_train = y_train
 # Y_test = y_test
@@ -64,19 +75,22 @@ model = Sequential()
 
 # model.add(LSTM(4))
 # model.add(TimeDistributed(LSTM(512)))
-model.add(LSTM(512, init=init, consume_less='gpu', activation='relu',
+dw = 0.1
+du = 0.1
+model.add(LSTM(32, init=init, consume_less='gpu', #activation='relu',
                input_dim=dimension, input_length=length,
-               # return_sequences=True,
-               dropout_W=0.1, dropout_U=0.1,
+               return_sequences=True,
+               dropout_W=dw, dropout_U=du,
                ))
 # model.add(GRU(32, init=init, return_sequences=True))
-# model.add(LSTM(512, init=init,
-#                activation='relu'
-#                ))
+model.add(LSTM(32, init=init, return_sequences=True, dropout_W=dw, dropout_U=du))
+model.add(LSTM(32, init=init, return_sequences=True, dropout_W=dw, dropout_U=du))
+model.add(LSTM(64, init=init, dropout_W=dw, dropout_U=du))
+model.add(Dropout(0.2))
 # model.add(GRU(2048))
 
 # model.add(Flatten())
-model.add(Dense(1024, init=init))
+model.add(Dense(512, init=init))
 # model.add(Activation('relu'))
 # model.add(Dropout(0.2))
 # model.add(Dense(1))
@@ -98,8 +112,8 @@ print(model.summary())
 
 try:
     weights_to_load = "./checkpoint.backup"
-    # model.load_weights(weights_to_load)
-    # print("Loaded weights " + weights_to_load)
+    model.load_weights(weights_to_load)
+    print("Loaded weights " + weights_to_load)
 except Exception as e:
     print(e)
 
@@ -124,16 +138,15 @@ def print_precision(class_number, predictions, y_test):
         class_number, percentage * 100, precision, selected_predictions[0]))
 
 for epoch in range(nb_epoch):
-    # print(get_prediction(inputs=[X_test[:10], 0]))
-    # model.pop()
-    # y_pred = model.predict(X_test, batch_size=batch_size).T
-    # print(y_pred[0][:20])
-    # print(y_pred[1][:20])
-    #
-    # print_precision(0, y_pred[0], y_test)
-    # print('-----------------------------')
-    # print_precision(1, y_pred[1], y_test)
-    # model.add(Activation('softmax'))
+    model.pop()
+    y_pred = model.predict(X_test, batch_size=batch_size).T
+    print(y_pred[0][:20])
+    print(y_pred[1][:20])
+
+    print_precision(0, y_pred[0], y_test)
+    print('-----------------------------')
+    print_precision(1, y_pred[1], y_test)
+    model.add(Activation('softmax'))
 
     print('epoch {}'.format(str(epoch)))
     model.fit(X_train, Y_train,

@@ -182,7 +182,7 @@ def mfi(a, period = 14):
 def load(file_path):
     global global_number_of_file_loaded
     a, b = preprocess(file_path)
-    print("Loading %s" % (file_path, ))
+    # print("Loading %s" % (file_path, ))
     columns = [
             'date',
             # 'sma%d' % window_size,
@@ -241,6 +241,7 @@ def gen_all(test=False):
     fs = fs[:1]
     async_results = []
     pool = Pool(processes=12)
+    print("Loading csvs...")
     for f in fs:
         async_results.append(pool.apply_async(load, (source_root + f,)))
         if test:
@@ -267,8 +268,8 @@ def gen_all(test=False):
 
 
 def load_all():
-    # if not os.path.exists(x_train_file + ".npy"):
-    produce_all()
+    if not os.path.exists(x_train_file + ".npy"):
+        produce_all()
     print("Loading " + x_train_file + ".npy")
     x_train = np.load(x_train_file + ".npy")
     print("Loading " + y_train_file + ".npy")
