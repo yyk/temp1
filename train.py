@@ -15,28 +15,20 @@ import numpy as np
 from sklearn.metrics import (precision_score, recall_score,
                              f1_score, accuracy_score)
 
-np.random.seed(1337)  # for reproducibility
+# np.random.seed(42)  # for reproducibility
 
 model_file = "./checkpoint"
 batch_size = 4096
 nb_epoch = 10000
 init='normal'
-
-X_train, y_train, X_test, y_test, train_sample_weight = data.load_all()
 nb_classes = 2
 
-weight_scaler = RobustScaler(quantile_range=(5.0, 95.0))
-train_sample_weight = weight_scaler.fit_transform(train_sample_weight.reshape(-1, 1))
-train_sample_weight = (np.absolute(train_sample_weight[:2000])) + 0.5
 
-# plt.plot(train_sample_weight)
-# plt.show()
-# sys.exit(1)
-
-# Y_train = y_train
-# Y_test = y_test
+X_train, y_train, X_test, y_test, train_sample_weight = data.load_shard0()
 Y_train = np_utils.to_categorical(np.array(y_train), 2)
 Y_test = np_utils.to_categorical(np.array(y_test), 2)
+
+y_test = data.load_y_test()
 
 # input image dimensions
 length = X_train.shape[2]
@@ -45,8 +37,6 @@ print("samples: %d channel: %d length: %d" % (X_train.shape[0], channel, length)
 
 print(X_train.shape)
 print(Y_train.shape)
-print(X_test.shape)
-print(Y_test.shape)
 
 print("x sample")
 print(X_train[0:3])
@@ -137,30 +127,33 @@ def print_precision(class_number, predictions, y_test):
         print("Class %d at top %1f%% precision %f, score %f" % (
         class_number, percentage * 100, precision, selected_predictions[0]))
 
+train_sample_generator = data.train_sample_generator(batch_size)
+test_sample_generator = data.test_sample_generator(batch_size)
+pridict_generator = data.predict_sample_generator(batch_size)
+
+number_of_train_samples =1461397
+number_of_test_samples =197463
+number_of_prediction_samples = int(len(y_test) / batch_size) * batch_size
+
 for epoch in range(nb_epoch):
     model.pop()
-    y_pred = model.predict(X_test, batch_size=batch_size).T
+    y_pred = model.predict_generator(generator=pridict_generator, val_samples=number_of_prediction_samples, max_q_size=10).T
     print(y_pred[0][:20])
     print(y_pred[1][:20])
 
-    print_precision(0, y_pred[0], y_test)
+    print_precision(0, y_pred[0], y_test[:number_of_prediction_samples])
     print('-----------------------------')
-    print_precision(1, y_pred[1], y_test)
+    print_precision(1, y_pred[1], y_test[:number_of_prediction_samples])
     model.add(Activation('softmax'))
 
     print('epoch {}'.format(str(epoch)))
-    model.fit(X_train, Y_train,
-            batch_size=batch_size,
-            nb_epoch=1,
-            verbose=1,
-            shuffle=False,
-            validation_data=(X_test, Y_test),
-            # callbacks=callbacks_list
-            # class_weight = {
-            #     0: 2,
-            #     1: 1.0}
-          )
+    model.fit_generator(generator=train_sample_generator, nb_epoch=1, verbose=1,
+                        samples_per_epoch=number_of_train_samples,
+                        max_q_size=50)
+    score = model.evaluate_generator(generator=test_sample_generator, verbose=1, val_samples=number_of_test_samples,
+                                     max_q_size=50)
     model.save(model_file + ".backup", overwrite=True)
+    print("Loss: %f, Accuracy: %f" % (score[0], score[1]))
     continue
 
     # if (epoch+1) % 5 == 0:
